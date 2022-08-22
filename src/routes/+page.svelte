@@ -100,7 +100,6 @@
   .output-content {
     padding: 1rem;
   }
-
   pre {
     padding: 1rem;
     white-space: pre-wrap;
