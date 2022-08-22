@@ -65,13 +65,14 @@
   }
   .markdown-editor {
     width: 100%;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     align-items: flex-start;
     justify-content: space-evenly;
   }
   .left-panel,
   .right-panel {
-    width: 50%;
+    /* width: 50%; */
     border: solid 1px black;
     height: 85vh;
     background: #ffffff;
@@ -130,5 +131,15 @@
   }
   .link h4 {
     margin-bottom: 0;
+  }
+
+  @media screen and (max-width: 600px) {
+    .markdown-editor {
+      grid-template-columns: 1fr;
+    }
+    .left-panel,
+    .right-panel {
+      height: 35vh;
+    }
   }
 </style>

@@ -5,7 +5,7 @@
   const note = decode(slug);
 </script>
 
-<div class="container">
+<div class="preview">
   {@html note}
 
   <div>
@@ -14,7 +14,7 @@
 </div>
 
 <style>
-  .container {
+  .preview {
     max-width: 80%;
     margin: 2rem auto;
   }
