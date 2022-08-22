@@ -37,7 +37,11 @@
     </div>
 
     <div class="right-panel">
-      <div class="output">{@html markdown}</div>
+      <div class="output">
+        <div class="output-content">
+          {@html markdown}
+        </div>
+      </div>
     </div>
   </div>
 </main>
@@ -72,7 +76,7 @@
     background: #ffffff;
   }
   .editor {
-    padding: 0 1rem;
+    padding: 1rem;
     height: 100%;
     background: #001628;
   }
@@ -92,8 +96,11 @@
   }
   .output {
     width: 100%;
-    padding: 0 2em;
   }
+  .output-content {
+    padding: 1rem;
+  }
+
   pre {
     padding: 1rem;
     white-space: pre-wrap;
