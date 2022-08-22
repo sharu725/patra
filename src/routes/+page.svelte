@@ -1,53 +1,38 @@
 <script>
   import { encode } from "js-base64";
-  // import marked from "marked";
+  import { page } from "$app/stores";
   import { onMount } from "svelte";
-
+  import { patraData } from "$lib/store";
   let MarkedComponent;
+
   let pageLoaded = false;
+
   onMount(async () => {
     MarkedComponent = await import("marked");
     pageLoaded = true;
   });
 
-  let source = `
-# H1 heading
-
-## H2 heading
-
-### H3 heading
-
---------
-
-**bold text**
-
-*italicized text*
-
---------
-
-1. First item
-2. Second item
-3. Third item
-
-- First item
-- Second item
-- Third item
-`;
-
-  let markdown = source;
-  $: if (pageLoaded) markdown = MarkedComponent.marked(source);
+  let markdown = "";
+  $: if (pageLoaded) markdown = MarkedComponent.marked($patraData);
   $: data = encode(markdown);
+
+  $: finalLink = `${$page.url.origin}/note/${data}`;
 </script>
 
 <main class="container">
   <header class="header">
-    <h1 class="header-title">Markdown editor</h1>
+    <h1 class="header-title">Patra</h1>
+    <div class="preview">
+      <a href={finalLink} target="_blank">
+        <button>Preview</button>
+      </a>
+    </div>
   </header>
 
   <div class="markdown-editor">
     <div class="left-panel">
       <div class="editor">
-        <textarea bind:value={source} class="source" />
+        <textarea bind:value={$patraData} class="source" />
       </div>
     </div>
 
@@ -57,23 +42,21 @@
   </div>
 </main>
 
-<h1>Your content link</h1>
-<pre><code>{`/note/${data}`}</code></pre>
-<a href="/note/{data}">Go here</a>
+<h4>Your patra link</h4>
+<pre><code>{`${finalLink}`}</code></pre>
 
 <style>
-  .container {
-    background: #ff3e00d6;
-  }
   .header {
-    height: 10vh;
     display: flex;
     align-items: center;
-    justify-content: center;
+    padding: 0 1rem;
+    font-weight: semibold;
+  }
+  .preview {
+    margin-left: auto;
   }
   .header-title {
     margin: 0;
-    color: #fff;
   }
   .markdown-editor {
     width: 100%;
@@ -112,7 +95,20 @@
     padding: 0 2em;
   }
   pre {
+    padding: 1rem;
     white-space: pre-wrap;
     word-break: break-all;
+    background-color: rgb(200, 249, 168);
+    border-radius: 0.25rem;
+    border: 1px dashed green;
+  }
+  button {
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    background-color: #83ba52;
+    border: 1px dashed #67993b;
+  }
+  button:hover {
+    background-color: #67993b;
   }
 </style>
