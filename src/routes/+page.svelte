@@ -45,9 +45,10 @@
     </div>
   </div>
 </main>
-
-<h4>Your patra link</h4>
-<pre><code>{`${finalLink}`}</code></pre>
+<div class="link">
+  <h4>Your patra link</h4>
+  <pre><code>{`${finalLink}`}</code></pre>
+</div>
 
 <style>
   .header {
@@ -74,11 +75,18 @@
     border: solid 1px black;
     height: 85vh;
     background: #ffffff;
+    overflow: hidden;
   }
   .editor {
-    padding: 1rem;
-    height: 100%;
     background: #001628;
+    height: 100%;
+    padding: 0 0 0 1rem;
+  }
+
+  textarea {
+    padding: 1rem 0;
+    height: 100%;
+    overflow-y: auto;
   }
 
   .right-panel {
@@ -116,5 +124,11 @@
   }
   button:hover {
     background-color: #67993b;
+  }
+  .link {
+    margin-top: 2rem;
+  }
+  .link h4 {
+    margin-bottom: 0;
   }
 </style>
