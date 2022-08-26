@@ -19,7 +19,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"js-base64": "^3.7.2",
 		"marked": "^4.0.19"
 	}
 }

@@ -6,10 +6,13 @@
 </script>
 
 <div class="preview">
-  {@html note}
-
+  {#if !note}
+    <h1>Not a valid input.</h1>
+  {:else}
+    {@html note}
+  {/if}
   <div class="home">
-    <a href="/"> Back to app </a>
+    <a href="/"> Back </a>
   </div>
 </div>
 
@@ -19,7 +22,6 @@
     flex-direction: column;
     max-width: 800px;
     margin: 2rem auto;
-    min-height: 99vh;
   }
   .home {
     margin-top: auto;
