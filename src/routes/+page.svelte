@@ -2,7 +2,7 @@
   import { encode } from "js-base64";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
-  import { patraData } from "$lib/store";
+  import { patraData, siteTitle } from "$lib/store";
   let MarkedComponent;
 
   let pageLoaded = false;
@@ -21,7 +21,9 @@
 
 <main class="container">
   <header class="header">
-    <h1 class="header-title">Patra</h1>
+    <a href="/">
+      <h1 class="header-title">{siteTitle}</h1>
+    </a>
     <div class="preview">
       <a href={finalLink} target="_blank">
         <button>Preview</button>
@@ -46,7 +48,7 @@
   </div>
 </main>
 <div class="link">
-  <h4>Your patra link</h4>
+  <h4>Your {siteTitle} link</h4>
   <pre><code>{`${finalLink}`}</code></pre>
 </div>
 
@@ -57,10 +59,15 @@
     padding: 0 1rem;
     font-weight: semibold;
   }
+  .header a {
+    text-decoration: none;
+    color: inherit;
+  }
   .preview {
     margin-left: auto;
   }
   .header-title {
+    text-transform: capitalize;
     margin: 0;
   }
   .markdown-editor {
