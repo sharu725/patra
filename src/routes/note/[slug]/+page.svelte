@@ -8,14 +8,20 @@
 <div class="preview">
   {@html note}
 
-  <div>
+  <div class="home">
     <a href="/"> Back to app </a>
   </div>
 </div>
 
 <style>
   .preview {
-    max-width: 80%;
+    display: flex;
+    flex-direction: column;
+    max-width: 800px;
     margin: 2rem auto;
+    min-height: 99vh;
+  }
+  .home {
+    margin-top: auto;
   }
 </style>
