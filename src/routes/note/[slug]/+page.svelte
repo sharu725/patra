@@ -1,8 +1,8 @@
 <script>
-  import { decode } from "js-base64";
+  import LZString from "$lib/lz";
   export let data;
   let { slug } = data;
-  const note = decode(slug);
+  const note = LZString.decompressFromEncodedURIComponent(slug);
 </script>
 
 <div class="preview">
