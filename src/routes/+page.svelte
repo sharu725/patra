@@ -24,11 +24,13 @@
     <a href="/">
       <h1 class="header-title">{siteTitle}</h1>
     </a>
-    <div class="preview">
-      <a href={finalLink} target="_blank">
-        <button>Preview</button>
-      </a>
-    </div>
+    {#if data}
+      <div class="preview">
+        <a href={finalLink} target="_blank">
+          <button>Preview</button>
+        </a>
+      </div>
+    {/if}
   </header>
 
   <div class="markdown-editor">
