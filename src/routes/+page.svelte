@@ -17,6 +17,8 @@
   $: data = encode(markdown);
 
   $: finalLink = `${$page.url.origin}/note/${data}`;
+
+  const copyText = () => navigator.clipboard.writeText(finalLink);
 </script>
 
 <main class="container">
@@ -26,7 +28,7 @@
     </a>
     {#if data}
       <div class="preview">
-        <a href={finalLink} target="_blank">
+        <a sveltekit:prefetch href={finalLink} target="_blank">
           <button>Preview</button>
         </a>
       </div>
@@ -50,7 +52,10 @@
   </div>
 </main>
 <div class="link">
-  <h4>Your {siteTitle} link</h4>
+  <div>
+    <h2>Your {siteTitle} link</h2>
+    <button on:click={copyText}>Copy</button>
+  </div>
   <pre><code>{`${finalLink}`}</code></pre>
 </div>
 
@@ -138,8 +143,16 @@
   .link {
     margin-top: 2rem;
   }
-  .link h4 {
+  .link h2 {
     margin-bottom: 0;
+  }
+  .link div {
+    display: flex;
+    place-items: center;
+  }
+  .link div button {
+    height: fit-content;
+    margin-left: auto;
   }
 
   @media screen and (max-width: 600px) {
