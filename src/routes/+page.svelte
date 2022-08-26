@@ -15,7 +15,6 @@
   let markdown = "";
   $: if (pageLoaded) markdown = MarkedComponent.marked($patraData);
   $: data = LZString.compressToEncodedURIComponent(markdown);
-  $: console.log(data);
   $: finalLink = `${$page.url.origin}/note/${data}`;
 
   const copyText = () => navigator.clipboard.writeText(finalLink);
