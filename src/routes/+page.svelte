@@ -1,5 +1,5 @@
 <script>
-  import { encode } from "js-base64";
+  import LZString from "$lib/lz";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
   import { patraData, siteTitle } from "$lib/store";
@@ -14,8 +14,8 @@
 
   let markdown = "";
   $: if (pageLoaded) markdown = MarkedComponent.marked($patraData);
-  $: data = encode(markdown);
-
+  $: data = LZString.compressToEncodedURIComponent(markdown);
+  $: console.log(data);
   $: finalLink = `${$page.url.origin}/note/${data}`;
 
   const copyText = () => navigator.clipboard.writeText(finalLink);
