@@ -74,13 +74,13 @@
   .left-panel,
   .right-panel {
     /* width: 50%; */
-    border: solid 1px black;
+    border: solid 1px rgb(84, 84, 84);
     height: 85vh;
     background: #ffffff;
     overflow: hidden;
   }
   .editor {
-    background: #001628;
+    background: #001845;
     height: 100%;
     padding: 0 0 0 1rem;
   }
@@ -98,8 +98,8 @@
     border: none;
     width: 100%;
     height: 100%;
-    background: #001628;
-    color: #83ba52;
+    background: #001845;
+    color: #61cb04;
   }
   .source:focus {
     outline: none;
