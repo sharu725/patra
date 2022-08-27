@@ -4,27 +4,15 @@ import { browser } from "$app/env";
 export const patraData = writable(
   (browser && localStorage.getItem("patraData")) ||
     `
-# H1 heading
+# Patra | Share your notes
 
-## H2 heading
+You can share short notes just with a link. No database. No storage!
 
-### H3 heading
+You can write short articles in markdown and share the link!
 
---------
+You can refresh the page but your notes remain as-is!
 
-**bold text**
-
-*italicized text*
-
---------
-
-1. First item
-2. Second item
-3. Third item
-
-- First item
-- Second item
-- Third item
+You can create tables as well!
 
 |Header 1 |Header 2  | Header 3|
 --- | --- | ---|
