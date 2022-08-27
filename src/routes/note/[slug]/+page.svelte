@@ -27,4 +27,10 @@
   .home {
     margin-top: auto;
   }
+  @media screen and (max-width: 600px) {
+    .preview {
+      margin: 1rem auto;
+      padding: 0 1em;
+    }
+  }
 </style>
