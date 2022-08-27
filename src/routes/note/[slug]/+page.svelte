@@ -8,7 +8,7 @@
 
 <div class="preview">
   {#if !source}
-    <h1>Not a valid input.</h1>
+    <h1>Not a valid URL.</h1>
   {:else}
     <SvelteMarkdown {source} />
   {/if}

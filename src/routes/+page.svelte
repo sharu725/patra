@@ -14,7 +14,7 @@
       <h1 class="header-title">{siteTitle}</h1>
     </a>
     {#if source}
-      <div class="preview">
+      <div class="preview-link">
         <a sveltekit:prefetch href={finalLink} target="_blank">
           <button>Preview</button>
         </a>
@@ -57,7 +57,7 @@
     text-decoration: none;
     color: inherit;
   }
-  .preview {
+  .preview-link {
     margin-left: auto;
   }
   .header-title {
@@ -128,7 +128,7 @@
     background-color: #67993b;
   }
   .link {
-    margin-top: 2rem;
+    margin-top: 1rem;
   }
   .link h2 {
     margin-bottom: 0;
@@ -149,6 +149,9 @@
     .left-panel,
     .right-panel {
       height: 35vh;
+    }
+    .link {
+      padding: 0 1rem;
     }
   }
 </style>

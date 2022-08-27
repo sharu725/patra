@@ -6,10 +6,6 @@
 </div>
 
 <style>
-  .preview {
-    max-width: 80%;
-    margin: 2rem auto;
-  }
   h2 {
     color: red;
   }
