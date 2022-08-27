@@ -3,7 +3,7 @@ import { browser } from "$app/env";
 
 export const patraData = writable(
   (browser && localStorage.getItem("patraData")) ||
-    `# Patra | Share your notes
+    `## Patra | Share your notes
 
 You can share short notes just with a link. No database. No storage!
 
