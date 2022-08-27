@@ -1,15 +1,16 @@
 <script>
   import LZString from "$lib/lz";
+  import SvelteMarkdown from "svelte-markdown";
   export let data;
   let { slug } = data;
-  const note = LZString.decompressFromEncodedURIComponent(slug);
+  const source = LZString.decompressFromEncodedURIComponent(slug);
 </script>
 
 <div class="preview">
-  {#if !note}
+  {#if !source}
     <h1>Not a valid input.</h1>
   {:else}
-    {@html note}
+    <SvelteMarkdown {source} />
   {/if}
   <div class="home">
     <a href="/"> Back </a>

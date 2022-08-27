@@ -1,22 +1,10 @@
 <script>
   import LZString from "$lib/lz";
   import { page } from "$app/stores";
-  import { onMount } from "svelte";
+  import SvelteMarkdown from "svelte-markdown";
   import { patraData, siteTitle } from "$lib/store";
-  let MarkedComponent;
-
-  let pageLoaded = false;
-
-  onMount(async () => {
-    MarkedComponent = await import("marked");
-    pageLoaded = true;
-  });
-
-  let markdown = "";
-  $: if (pageLoaded) markdown = MarkedComponent.marked($patraData);
-  $: data = LZString.compressToEncodedURIComponent(markdown);
-  $: finalLink = `${$page.url.origin}/note/${data}`;
-
+  $: source = LZString.compressToEncodedURIComponent($patraData);
+  $: finalLink = `${$page.url.origin}/note/${source}`;
   const copyText = () => navigator.clipboard.writeText(finalLink);
 </script>
 
@@ -25,7 +13,7 @@
     <a href="/">
       <h1 class="header-title">{siteTitle}</h1>
     </a>
-    {#if data}
+    {#if source}
       <div class="preview">
         <a sveltekit:prefetch href={finalLink} target="_blank">
           <button>Preview</button>
@@ -44,7 +32,7 @@
     <div class="right-panel">
       <div class="output">
         <div class="output-content">
-          {@html markdown}
+          <SvelteMarkdown source={$patraData} />
         </div>
       </div>
     </div>
