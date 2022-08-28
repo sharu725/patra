@@ -2,6 +2,7 @@
   import LZString from "$lib/lz";
   import { page } from "$app/stores";
   import SvelteMarkdown from "svelte-markdown";
+  import { Pane, Splitpanes } from "svelte-splitpanes";
   import { patraData, siteTitle } from "$lib/store";
   $: source = LZString.compressToEncodedURIComponent($patraData);
   $: finalLink = `${$page.url.origin}/note/${source}`;
@@ -21,30 +22,34 @@
       </div>
     {/if}
   </header>
-
   <div class="markdown-editor">
-    <div class="left-panel">
-      <div class="editor">
-        <textarea bind:value={$patraData} class="source" />
-      </div>
-    </div>
-
-    <div class="right-panel">
-      <div class="output">
-        <div class="output-content">
-          <SvelteMarkdown source={$patraData} />
+    <Splitpanes class="default-theme">
+      <Pane>
+        <div class="left-panel">
+          <div class="editor">
+            <textarea bind:value={$patraData} class="source" />
+          </div>
         </div>
-      </div>
+      </Pane>
+      <Pane>
+        <div class="right-panel">
+          <div class="output">
+            <div class="output-content">
+              <SvelteMarkdown source={$patraData} />
+            </div>
+          </div>
+        </div>
+      </Pane>
+    </Splitpanes>
+  </div>
+  <div class="link">
+    <div>
+      <h2>Your {siteTitle} link</h2>
+      <button on:click={copyText}>Copy</button>
     </div>
+    <pre><code>{`${finalLink}`}</code></pre>
   </div>
 </main>
-<div class="link">
-  <div>
-    <h2>Your {siteTitle} link</h2>
-    <button on:click={copyText}>Copy</button>
-  </div>
-  <pre><code>{`${finalLink}`}</code></pre>
-</div>
 <svelte:head>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -77,14 +82,9 @@
   }
   .markdown-editor {
     width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: flex-start;
-    justify-content: space-evenly;
   }
   .left-panel,
   .right-panel {
-    /* width: 50%; */
     border: solid 1px rgb(84, 84, 84);
     height: 85vh;
     background: #ffffff;
@@ -133,9 +133,11 @@
     padding: 0.25rem 0.5rem;
     cursor: pointer;
     background-color: #83ba52;
-    border: 1px dashed #67993b;
+    border: 1px solid #83ba52;
+    border-radius: 2px;
   }
   button:hover {
+    color: #111;
     background-color: #67993b;
   }
   .link {
