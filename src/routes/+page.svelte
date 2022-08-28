@@ -139,7 +139,7 @@
     background-color: #67993b;
   }
   .link {
-    margin-top: 1rem;
+    margin: 1rem;
   }
   .link h2 {
     margin-bottom: 0;
@@ -160,9 +160,6 @@
     .left-panel,
     .right-panel {
       height: 35vh;
-    }
-    .link {
-      padding: 0 1rem;
     }
   }
 </style>
