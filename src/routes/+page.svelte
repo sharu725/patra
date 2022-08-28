@@ -4,9 +4,14 @@
   import SvelteMarkdown from "svelte-markdown";
   import { Pane, Splitpanes } from "svelte-splitpanes";
   import { patraData, siteTitle } from "$lib/store";
+  import { onMount } from "svelte";
   $: source = LZString.compressToEncodedURIComponent($patraData);
   $: finalLink = `${$page.url.origin}/note/${source}`;
   const copyText = () => navigator.clipboard.writeText(finalLink);
+  let isPhone = true;
+  onMount(() => {
+    isPhone = window.screen.width < 600;
+  });
 </script>
 
 <main class="container">
@@ -23,7 +28,7 @@
     {/if}
   </header>
   <div class="markdown-editor">
-    <Splitpanes class="default-theme">
+    <Splitpanes class="default-theme" horizontal={isPhone}>
       <Pane>
         <div class="left-panel">
           <div class="editor">
