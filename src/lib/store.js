@@ -9,6 +9,8 @@ You can share short notes just with a link. No database. No storage!
 
 You can write short articles in markdown and share the link!
 
+You can write around 100,000 characters which is roughly 15k words.
+
 You can refresh the page but your notes remain as-is!
 
 You can create tables as well!
