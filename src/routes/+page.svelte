@@ -45,6 +45,17 @@
   </div>
   <pre><code>{`${finalLink}`}</code></pre>
 </div>
+<svelte:head>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+
+    gtag("config", "G-Q1KNZ1DXGT");
+  </script>
+</svelte:head>
 
 <style>
   .header {
