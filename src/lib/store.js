@@ -18,6 +18,14 @@ You can share short notes with just a link. No database. No storage!
 
 - check the link generated at the bottom.
 
+### Use this as a Todo list app
+
+- ~do a thing~
+- do another thing
+
+The note will remain until overwritten.
+    
+    
 `
 );
 

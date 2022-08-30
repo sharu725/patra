@@ -4,7 +4,8 @@
   import SvelteMarkdown from "svelte-markdown";
   import SplitPane from "$lib/components/SplitPanes.svelte";
   import { patraData, siteTitle } from "$lib/store";
-  
+  import { dev } from "$app/env";
+
   $: source = LZString.compressToEncodedURIComponent($patraData);
   $: finalLink = `${$page.url.origin}/note/${source}`;
   const copyText = () => navigator.clipboard.writeText(finalLink);
@@ -52,15 +53,17 @@
   </div>
 </main>
 <svelte:head>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-    gtag("js", new Date());
+  {#if !dev}
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
 
-    gtag("config", "G-Q1KNZ1DXGT");
-  </script>
+      gtag("config", "G-Q1KNZ1DXGT");
+    </script>
+  {/if}
 </svelte:head>
 
 <style>
