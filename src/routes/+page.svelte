@@ -2,7 +2,8 @@
   import LZString from "$lib/lz";
   import { page } from "$app/stores";
   import SvelteMarkdown from "svelte-markdown";
-  import { Pane, Splitpanes } from "svelte-splitpanes";
+  // import { Pane, Splitpanes } from "svelte-splitpanes";
+  import SplitPane from "$lib/components/SplitPanes.svelte";
   import { patraData, siteTitle } from "$lib/store";
   import { onMount } from "svelte";
   $: source = LZString.compressToEncodedURIComponent($patraData);
@@ -28,15 +29,15 @@
     {/if}
   </header>
   <div class="markdown-editor">
-    <Splitpanes class="default-theme" horizontal={isPhone}>
-      <Pane>
+    <SplitPane>
+      <svelte:fragment slot="left">
         <div class="left-panel">
           <div class="editor">
             <textarea bind:value={$patraData} class="source" />
           </div>
         </div>
-      </Pane>
-      <Pane>
+      </svelte:fragment>
+      <svelte:fragment slot="right">
         <div class="right-panel">
           <div class="output">
             <div class="output-content">
@@ -44,8 +45,8 @@
             </div>
           </div>
         </div>
-      </Pane>
-    </Splitpanes>
+      </svelte:fragment>
+    </SplitPane>
   </div>
   <div class="link">
     <div>
@@ -166,7 +167,7 @@
     }
     .left-panel,
     .right-panel {
-      height: 35vh;
+      height: 45vh;
     }
   }
 </style>

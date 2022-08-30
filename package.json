@@ -19,7 +19,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"svelte-markdown": "^0.2.3",
-		"svelte-splitpanes": "^0.7.3"
+		"svelte-markdown": "^0.2.3"
 	}
 }
