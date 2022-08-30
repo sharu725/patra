@@ -27,81 +27,81 @@ var LZString = (function () {
   }
 
   var LZString = {
-    compressToBase64: function (input) {
-      if (input == null) return "";
-      var res = LZString._compress(input, 6, function (a) {
-        return keyStrBase64.charAt(a);
-      });
-      switch (
-        res.length % 4 // To produce valid Base64
-      ) {
-        default: // When could this happen ?
-        case 0:
-          return res;
-        case 1:
-          return res + "===";
-        case 2:
-          return res + "==";
-        case 3:
-          return res + "=";
-      }
-    },
+    // compressToBase64: function (input) {
+    //   if (input == null) return "";
+    //   var res = LZString._compress(input, 6, function (a) {
+    //     return keyStrBase64.charAt(a);
+    //   });
+    //   switch (
+    //     res.length % 4 // To produce valid Base64
+    //   ) {
+    //     default: // When could this happen ?
+    //     case 0:
+    //       return res;
+    //     case 1:
+    //       return res + "===";
+    //     case 2:
+    //       return res + "==";
+    //     case 3:
+    //       return res + "=";
+    //   }
+    // },
 
-    decompressFromBase64: function (input) {
-      if (input == null) return "";
-      if (input == "") return null;
-      return LZString._decompress(input.length, 32, function (index) {
-        return getBaseValue(keyStrBase64, input.charAt(index));
-      });
-    },
+    // decompressFromBase64: function (input) {
+    //   if (input == null) return "";
+    //   if (input == "") return null;
+    //   return LZString._decompress(input.length, 32, function (index) {
+    //     return getBaseValue(keyStrBase64, input.charAt(index));
+    //   });
+    // },
 
-    compressToUTF16: function (input) {
-      if (input == null) return "";
-      return (
-        LZString._compress(input, 15, function (a) {
-          return f(a + 32);
-        }) + " "
-      );
-    },
+    // compressToUTF16: function (input) {
+    //   if (input == null) return "";
+    //   return (
+    //     LZString._compress(input, 15, function (a) {
+    //       return f(a + 32);
+    //     }) + " "
+    //   );
+    // },
 
-    decompressFromUTF16: function (compressed) {
-      if (compressed == null) return "";
-      if (compressed == "") return null;
-      return LZString._decompress(compressed.length, 16384, function (index) {
-        return compressed.charCodeAt(index) - 32;
-      });
-    },
+    // decompressFromUTF16: function (compressed) {
+    //   if (compressed == null) return "";
+    //   if (compressed == "") return null;
+    //   return LZString._decompress(compressed.length, 16384, function (index) {
+    //     return compressed.charCodeAt(index) - 32;
+    //   });
+    // },
 
     //compress into uint8array (UCS-2 big endian format)
-    compressToUint8Array: function (uncompressed) {
-      var compressed = LZString.compress(uncompressed);
-      var buf = new Uint8Array(compressed.length * 2); // 2 bytes per character
+    // compressToUint8Array: function (uncompressed) {
+    //   var compressed = LZString.compress(uncompressed);
+    //   var buf = new Uint8Array(compressed.length * 2); // 2 bytes per character
 
-      for (var i = 0, TotalLen = compressed.length; i < TotalLen; i++) {
-        var current_value = compressed.charCodeAt(i);
-        buf[i * 2] = current_value >>> 8;
-        buf[i * 2 + 1] = current_value % 256;
-      }
-      return buf;
-    },
+    //   for (var i = 0, TotalLen = compressed.length; i < TotalLen; i++) {
+    //     var current_value = compressed.charCodeAt(i);
+    //     buf[i * 2] = current_value >>> 8;
+    //     buf[i * 2 + 1] = current_value % 256;
+    //   }
+    //   return buf;
+    // },
 
     //decompress from uint8array (UCS-2 big endian format)
-    decompressFromUint8Array: function (compressed) {
-      if (compressed === null || compressed === undefined) {
-        return LZString.decompress(compressed);
-      } else {
-        var buf = new Array(compressed.length / 2); // 2 bytes per character
-        for (var i = 0, TotalLen = buf.length; i < TotalLen; i++) {
-          buf[i] = compressed[i * 2] * 256 + compressed[i * 2 + 1];
-        }
+    // decompressFromUint8Array: function (compressed) {
+    //   if (compressed === null || compressed === undefined) {
+    //     return LZString.decompress(compressed);
+    //   } else {
+    //     var buf = new Array(compressed.length / 2); // 2 bytes per character
+    //     for (var i = 0, TotalLen = buf.length; i < TotalLen; i++) {
+    //       buf[i] = compressed[i * 2] * 256 + compressed[i * 2 + 1];
+    //     }
 
-        var result = [];
-        buf.forEach(function (c) {
-          result.push(f(c));
-        });
-        return LZString.decompress(result.join(""));
-      }
-    },
+    //     var result = [];
+    //     buf.forEach(function (c) {
+    //       result.push(f(c));
+    //     });
+    //     return LZString.decompress(result.join(""));
+    //   }
+    // },
 
     //compress into a string that is already URI encoded
     compressToEncodedURIComponent: function (input) {

@@ -2,17 +2,12 @@
   import LZString from "$lib/lz";
   import { page } from "$app/stores";
   import SvelteMarkdown from "svelte-markdown";
-  // import { Pane, Splitpanes } from "svelte-splitpanes";
   import SplitPane from "$lib/components/SplitPanes.svelte";
   import { patraData, siteTitle } from "$lib/store";
-  import { onMount } from "svelte";
+  
   $: source = LZString.compressToEncodedURIComponent($patraData);
   $: finalLink = `${$page.url.origin}/note/${source}`;
   const copyText = () => navigator.clipboard.writeText(finalLink);
-  let isPhone = true;
-  onMount(() => {
-    isPhone = window.screen.width < 600;
-  });
 </script>
 
 <main class="container">

@@ -1,6 +1,7 @@
 <script>
   import LZString from "$lib/lz";
   import SvelteMarkdown from "svelte-markdown";
+  
   export let data;
   let { slug } = data;
   const source = LZString.decompressFromEncodedURIComponent(slug);
