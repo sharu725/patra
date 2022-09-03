@@ -1,3 +1,5 @@
+[![Using-Sveltekit](https://img.shields.io/badge/Using-Sveltekit-orange)](https://kit.svelte.dev/)
+
 ## Patra | Share your notes!
 
 You can share short notes with just a link. No database. No storage!
