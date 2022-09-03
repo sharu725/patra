@@ -1,38 +1,22 @@
-# create-svelte
+## Patra | Share your notes!
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+You can share short notes with just a link. No database. No storage!
 
-## Creating a project
+- write short articles in **markdown** and share the link!
+- write around **100,000 characters** which is roughly **15k words**.
+- content stored locally. Page **refresh will not lose progress**!
+- create **tables** as well!
 
-If you're seeing this, you've probably already done this step. Congrats!
+| Header 1 | Header 2 | Header 3 |
+| -------- | -------- | -------- |
+| data 1   | data 2   | data 3   |
+| data 11  | data 12  | data 13  |
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+- check the link generated at the bottom.
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+### Use this as a Todo list app
 
-## Developing
+- ~do a thing~
+- do another thing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+The note will remain until overwritten.
