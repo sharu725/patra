@@ -18,7 +18,7 @@
     </a>
     {#if source}
       <div class="preview-link">
-        <a sveltekit:prefetch href={finalLink} target="_blank">
+        <a sveltekit:prefetch href={finalLink}>
           <button>Preview</button>
         </a>
       </div>
