@@ -1,4 +1,4 @@
-[![Using-Sveltekit](https://img.shields.io/badge/Using-Sveltekit-orange)](https://kit.svelte.dev/)
+[![Powered by](https://img.shields.io/badge/Powered%20by-Sveltekit-orange)](https://kit.svelte.dev/)
 
 ## Patra | Share your notes!
 
