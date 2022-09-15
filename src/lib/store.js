@@ -18,6 +18,11 @@ You can share short notes with just a link. No database. No storage!
 
 - check the link generated at the bottom.
 
+### Features
+- markdown support
+- light-weight
+- SSR by default
+
 ### Use this as a Todo list app
 
 - ~do a thing~
