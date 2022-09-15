@@ -50,6 +50,12 @@
       <button on:click={copyText}>Copy</button>
     </div>
     <pre><code>{`${finalLink}`}</code></pre>
+
+    <div>
+      <p>
+        <a href="https://github.com/sharu725/patra">Contribute</a>
+      </p>
+    </div>
   </div>
 </main>
 <svelte:head>
