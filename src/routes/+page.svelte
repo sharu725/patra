@@ -4,7 +4,7 @@
   import SvelteMarkdown from "svelte-markdown";
   import SplitPane from "$lib/components/SplitPanes.svelte";
   import { patraData, siteTitle } from "$lib/store";
-  import { dev } from "$app/env";
+  import { dev } from "$app/environment";
 
   $: source = LZString.compressToEncodedURIComponent($patraData);
   $: finalLink = `${$page.url.origin}/note/${source}`;
@@ -18,7 +18,7 @@
     </a>
     {#if source}
       <div class="preview-link">
-        <a sveltekit:prefetch href={finalLink}>
+        <a data-sveltekit-preload-data href={finalLink}>
           <button>Preview</button>
         </a>
       </div>
