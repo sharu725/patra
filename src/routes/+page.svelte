@@ -37,7 +37,9 @@
         <div class="right-panel">
           <div class="output">
             <div class="output-content">
-              <SvelteMarkdown source={$patraData} />
+              {#key $patraData}
+                <SvelteMarkdown source={$patraData} />
+              {/key}
             </div>
           </div>
         </div>
