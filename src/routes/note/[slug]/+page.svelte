@@ -1,7 +1,8 @@
 <script>
+  import { SITE_DESCRIPTION, SITE_SHORT_TITLE } from "$lib/constants.js";
   import LZString from "$lib/lz";
   import SvelteMarkdown from "svelte-markdown";
-  
+
   export let data;
   let { slug } = data;
   const source = LZString.decompressFromEncodedURIComponent(slug);
@@ -17,6 +18,11 @@
     <a href="/"> Back </a>
   </div>
 </div>
+
+<svelte:head>
+  <title>{SITE_SHORT_TITLE} | {source?.slice(0, 20)}</title>
+  <meta name="description" content={SITE_DESCRIPTION} />
+</svelte:head>
 
 <style>
   .preview {

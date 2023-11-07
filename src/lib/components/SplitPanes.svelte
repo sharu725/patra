@@ -26,7 +26,7 @@
   <div bind:this={left} class="left" style="flex-basis: {leftInitialSize}">
     <slot name="left" />
   </div>
-  <div class="splitter" on:mousedown={dragstart} />
+  <div class="splitter" on:mousedown={dragstart} role="separator" />
   <div class="right">
     <slot name="right" />
   </div>

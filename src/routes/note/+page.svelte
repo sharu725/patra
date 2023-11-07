@@ -1,7 +1,7 @@
 <div class="preview">
   <h2>Content is empty.</h2>
   <div>
-    <a sveltekit:prefetch href="/"> Back to app </a>
+    <a data-sveltekit-preload-data href="/"> Back to app </a>
   </div>
 </div>
 

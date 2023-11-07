@@ -5,6 +5,7 @@
   import SplitPane from "$lib/components/SplitPanes.svelte";
   import { patraData, siteTitle } from "$lib/store";
   import { dev } from "$app/environment";
+  import { GITHUB_REPO, SITE_DESCRIPTION, SITE_TITLE } from "$lib/constants";
 
   $: source = LZString.compressToEncodedURIComponent($patraData);
   $: finalLink = `${$page.url.origin}/note/${source}`;
@@ -55,12 +56,14 @@
 
     <div>
       <p>
-        <a href="https://github.com/sharu725/patra">Contribute</a>
+        <a href={GITHUB_REPO}>Contribute</a>
       </p>
     </div>
   </div>
 </main>
 <svelte:head>
+  <title>{SITE_TITLE}</title>
+  <meta name="description" content={SITE_DESCRIPTION} />
   {#if !dev}
     <script>
       window.dataLayer = window.dataLayer || [];
