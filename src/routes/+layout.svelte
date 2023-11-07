@@ -1,5 +1,6 @@
 <script>
   import { navigating } from "$app/stores";
+  import { SITE_PREVIEW } from "$lib/constants";
   import { fly } from "svelte/transition";
 </script>
 
@@ -10,3 +11,7 @@
     {/if}
   </div>
 {/key}
+
+<svelte:head>
+  <meta property="og:image" content={SITE_PREVIEW} />
+</svelte:head>
