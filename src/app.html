@@ -1,82 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%sveltekit.assets%/favicon.ico" />
-    <meta name="viewport" content="width=device-width" />
-    %sveltekit.head%
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
-      rel="stylesheet"
-    />
-    
-    <link
-      rel="apple-touch-icon-precomposed"
-      sizes="180x180"
-      href="/apple-touch-icon.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="192x192"
-      href="/android-chrome-192x192.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="512x512"
-      href="/android-chrome-512x512.png"
-    />
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: "JetBrains Mono", monospace;
-      }
-      .output-content *,
-      .preview * {
-        max-width: 100%;
-      }
-      .preview {
-        max-width: 80%;
-        margin: 2rem auto;
-      }
-      table {
-        margin-bottom: 1rem;
-        width: 100%;
-        border: 0 solid #999;
-        border-collapse: collapse;
-      }
 
-      td,
-      th {
-        padding: 0.25rem 0.5rem;
-        border-color: inherit;
-        padding: 0.25rem 0.5rem;
-        border: 1px solid #e5e5e5;
-      }
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="%sveltekit.assets%/favicon.ico" />
+  <meta name="viewport" content="width=device-width" />
+  %sveltekit.head%
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
+    rel="stylesheet" />
 
-      th {
-        text-align: left;
-      }
+  <link rel="apple-touch-icon-precomposed" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "JetBrains Mono", monospace;
+      --brand-color: #67993b
+    }
 
-      thead th {
-        border-bottom-color: #999;
-      }
-      tbody tr:nth-child(odd) td,
-      tbody tr:nth-child(odd) th {
-        background-color: #f9f9f9;
-      }
-    </style>
-    <!-- Google tag (gtag.js) -->
-    <script
-      async
-      src="https://www.googletagmanager.com/gtag/js?id=G-Q1KNZ1DXGT"
-    ></script>
-  </head>
-  <body>
-    <div>%sveltekit.body%</div>
-  </body>
+    .output-content *,
+    .preview * {
+      max-width: 100%;
+    }
+
+    .preview {
+      max-width: 80%;
+      margin: 2rem auto;
+    }
+
+    blockquote {
+      padding-left: 1em;
+      margin-left: 1rem;
+      font-style: italic;
+      border-left: 2px solid var(--brand-color);
+    }
+
+    pre {
+      padding: 1rem;
+      white-space: pre-wrap;
+      word-break: break-all;
+      background-color: rgb(200, 249, 168);
+      border-radius: 0.25rem;
+      border: 1px dashed green;
+    }
+
+    table {
+      margin-bottom: 1rem;
+      width: 100%;
+      border: 0 solid #999;
+      border-collapse: collapse;
+    }
+
+    td,
+    th {
+      padding: 0.25rem 0.5rem;
+      border-color: inherit;
+      padding: 0.25rem 0.5rem;
+      border: 1px solid #e5e5e5;
+    }
+
+    th {
+      text-align: left;
+    }
+
+    thead th {
+      border-bottom-color: #999;
+    }
+
+    tbody tr:nth-child(odd) td,
+    tbody tr:nth-child(odd) th {
+      background-color: #f9f9f9;
+    }
+  </style>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q1KNZ1DXGT"></script>
+</head>
+
+<body>
+  <div>%sveltekit.body%</div>
+</body>
+
 </html>

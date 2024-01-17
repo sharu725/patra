@@ -28,9 +28,11 @@ You can share short notes with just a link. No database. No storage!
 - ~do a thing~
 - do another thing
 
-The note will remain until overwritten.
-    
-    
+\`\`\`html
+<p>Highlight code blocks</p>
+\`\`\`
+
+The note will remain until overwritten.    
 `
 );
 

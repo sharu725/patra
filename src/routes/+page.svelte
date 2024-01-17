@@ -136,14 +136,7 @@
   .output-content {
     padding: 1rem;
   }
-  pre {
-    padding: 1rem;
-    white-space: pre-wrap;
-    word-break: break-all;
-    background-color: rgb(200, 249, 168);
-    border-radius: 0.25rem;
-    border: 1px dashed green;
-  }
+
   button {
     padding: 0.25rem 0.5rem;
     cursor: pointer;
@@ -151,10 +144,12 @@
     border: 1px solid #83ba52;
     border-radius: 2px;
   }
+
   button:hover {
     color: #111;
-    background-color: #67993b;
+    background-color: var(--brand-color);
   }
+
   .link {
     margin: 1rem;
   }
