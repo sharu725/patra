@@ -24,7 +24,7 @@
     </a>
     {#if source}
       <div class="preview-link">
-        <a data-sveltekit-preload-data href={finalLink}> Preview </a>
+        <a href={finalLink}> Preview </a>
       </div>
     {/if}
   </header>
