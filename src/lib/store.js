@@ -1,9 +1,7 @@
 import { writable } from "svelte/store";
 import { browser } from "$app/environment";
 
-export const patraData = writable(
-  (browser && localStorage.getItem("patraData")) ||
-    `## Patra | Share your notes!
+export const defaultValue = `## Patra | Share your notes!
 You can share short notes with just a link. No database. No storage!
 
 - write short articles in **markdown** and share the link!
@@ -33,7 +31,9 @@ You can share short notes with just a link. No database. No storage!
 \`\`\`
 
 The note will remain until overwritten.    
-`
+`;
+export const patraData = writable(
+  (browser && localStorage.getItem("patraData")) || defaultValue
 );
 
 patraData.subscribe((val) => browser && (localStorage.patraData = val));

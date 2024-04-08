@@ -3,13 +3,13 @@
   import LZString from "$lib/lz";
   import SvelteMarkdown from "svelte-markdown";
 
-  export let data;
-  let { slug } = data;
+  let { data } = $props();
+  const { slug } = data;
   const source = LZString.decompressFromEncodedURIComponent(slug);
 </script>
 
 <div class="preview">
-  {#if !source}
+  {#if slug != "Q" && !source}
     <h1>Not a valid URL.</h1>
   {:else}
     <SvelteMarkdown {source} />

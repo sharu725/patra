@@ -6,13 +6,19 @@
   import { patraData, siteTitle } from "$lib/store";
   import { dev } from "$app/environment";
   import { GITHUB_REPO, SITE_DESCRIPTION, SITE_TITLE } from "$lib/constants";
+  import { onMount } from "svelte";
 
   let source = $state(LZString.compressToEncodedURIComponent($patraData));
   let finalLink = $derived(`${$page.url.origin}/note/${source}`);
+  let isPageLoaded = $state(false);
 
   const updateData = () => {
     source = LZString.compressToEncodedURIComponent($patraData);
   };
+
+  onMount(() => {
+    isPageLoaded = true;
+  });
 
   const copyText = () => navigator.clipboard.writeText(finalLink);
 </script>
@@ -22,7 +28,7 @@
     <a href="/">
       <h1 class="header-title">{siteTitle}</h1>
     </a>
-    {#if source}
+    {#if isPageLoaded}
       <div class="preview-link">
         <a href={finalLink}> Preview </a>
       </div>
@@ -57,7 +63,7 @@
   <div class="link">
     <div>
       <h2>Your {siteTitle} link</h2>
-      <button on:click={copyText}>Copy</button>
+      <button onclick={copyText}>Copy</button>
     </div>
     <pre><code>{`${finalLink}`}</code></pre>
 
