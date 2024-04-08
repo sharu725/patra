@@ -7,8 +7,13 @@
   import { dev } from "$app/environment";
   import { GITHUB_REPO, SITE_DESCRIPTION, SITE_TITLE } from "$lib/constants";
 
-  $: source = LZString.compressToEncodedURIComponent($patraData);
-  $: finalLink = `${$page.url.origin}/note/${source}`;
+  let source = $state(LZString.compressToEncodedURIComponent($patraData));
+  let finalLink = $derived(`${$page.url.origin}/note/${source}`);
+
+  const updateData = () => {
+    source = LZString.compressToEncodedURIComponent($patraData);
+  };
+
   const copyText = () => navigator.clipboard.writeText(finalLink);
 </script>
 
@@ -19,9 +24,7 @@
     </a>
     {#if source}
       <div class="preview-link">
-        <a data-sveltekit-preload-data href={finalLink}>
-          <button>Preview</button>
-        </a>
+        <a data-sveltekit-preload-data href={finalLink}> Preview </a>
       </div>
     {/if}
   </header>
@@ -30,7 +33,11 @@
       <svelte:fragment slot="left">
         <div class="left-panel">
           <div class="editor">
-            <textarea bind:value={$patraData} class="source" />
+            <textarea
+              bind:value={$patraData}
+              oninput={updateData}
+              class="source"
+            />
           </div>
         </div>
       </svelte:fragment>
@@ -71,7 +78,6 @@
         dataLayer.push(arguments);
       }
       gtag("js", new Date());
-
       gtag("config", "G-Q1KNZ1DXGT");
     </script>
   {/if}
