@@ -10,8 +10,10 @@
 
   const handleParsed = (/** @type {{ detail: { tokens: any; }; }} */ event) => {
     const tokens = event.detail.tokens;
+    let index = 0;
     tokens.map(({ text }) => {
-      if (text) {
+      if (text && !index) {
+        index++;
         metaTitle = text;
       }
     });

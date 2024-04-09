@@ -30,7 +30,7 @@
     </a>
     {#if isPageLoaded}
       <div class="preview-link">
-        <a href={finalLink}> Preview </a>
+        <a class="btn" href={finalLink}> Preview </a>
       </div>
     {/if}
   </header>
@@ -63,7 +63,7 @@
   <div class="link">
     <div>
       <h2>Your {siteTitle} link</h2>
-      <button onclick={copyText}>Copy</button>
+      <button class="btn" onclick={copyText}>Copy</button>
     </div>
     <pre><code>{`${finalLink}`}</code></pre>
 
@@ -120,18 +120,20 @@
   .editor {
     background: #001845;
     height: 100%;
-    padding: 0 0 0 1rem;
   }
 
   textarea {
-    padding: 1rem 0;
+    font-size: 18px;
+    padding: 1rem;
     height: 100%;
     overflow-y: auto;
   }
 
   .right-panel {
+    font-size: 18px;
     overflow: auto;
   }
+
   .source {
     border: none;
     width: 100%;
@@ -149,7 +151,7 @@
     padding: 1rem;
   }
 
-  button {
+  .btn {
     padding: 0.25rem 0.5rem;
     cursor: pointer;
     background-color: #83ba52;
@@ -157,7 +159,7 @@
     border-radius: 2px;
   }
 
-  button:hover {
+  .btn:hover {
     color: #111;
     background-color: var(--brand-color);
   }
@@ -181,9 +183,9 @@
     .markdown-editor {
       grid-template-columns: 1fr;
     }
-    .left-panel,
+
     .right-panel {
-      height: 45vh;
+      display: none;
     }
   }
 </style>
