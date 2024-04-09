@@ -10,14 +10,12 @@
 
   function drag(e) {
     if (!isDragging) return;
-
     const elementLeft = left.getBoundingClientRect().left;
     left.style.flexBasis = e.clientX - elementLeft + "px";
   }
 
   function dragend() {
     if (!isDragging) return;
-
     isDragging = false;
   }
 </script>
@@ -26,7 +24,7 @@
   <div bind:this={left} class="left" style="flex-basis: {leftInitialSize}">
     <slot name="left" />
   </div>
-  <div class="splitter" on:mousedown={dragstart} role="separator" />
+  <button class="splitter" on:mousedown={dragstart} />
   <div class="right">
     <slot name="right" />
   </div>
@@ -34,6 +32,8 @@
 
 <style>
   .splitter {
+    padding: 0;
+    border: none;
     flex-grow: 0;
     flex-shrink: 0;
     width: 0px;
