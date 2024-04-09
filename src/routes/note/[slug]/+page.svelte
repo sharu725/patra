@@ -11,6 +11,7 @@
   const handleParsed = (/** @type {{ detail: { tokens: any; }; }} */ event) => {
     const tokens = event.detail.tokens;
     metaTitle = tokens[0]?.text;
+    console.log(tokens, metaTitle);
   };
 </script>
 
@@ -26,7 +27,7 @@
 </div>
 
 <svelte:head>
-  <title>{SITE_SHORT_TITLE} | {metaTitle}</title>
+  <title>{metaTitle ?? SITE_SHORT_TITLE}</title>
   <meta name="description" content={SITE_DESCRIPTION} />
 </svelte:head>
 
