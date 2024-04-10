@@ -11,16 +11,21 @@
   let source = $state(LZString.compressToEncodedURIComponent($patraData));
   let finalLink = $derived(`${$page.url.origin}/note/${source}`);
   let isPageLoaded = $state(false);
+  let inputCharacterCount = $state(0);
+  let outputCharacterCount = $derived(finalLink?.length);
 
-  const updateData = () => {
+  const handleInput = () => {
     source = LZString.compressToEncodedURIComponent($patraData);
+    inputCharacterCount = $patraData?.length;
   };
 
   onMount(() => {
     isPageLoaded = true;
+    inputCharacterCount = $patraData?.length;
   });
 
   const copyText = () => navigator.clipboard.writeText(finalLink);
+
 </script>
 
 <main class="container">
@@ -41,10 +46,11 @@
           <div class="editor">
             <textarea
               bind:value={$patraData}
-              oninput={updateData}
+              oninput={handleInput}
               class="source"
             />
           </div>
+          <div class="count">{inputCharacterCount} characters</div>
         </div>
       </svelte:fragment>
       <svelte:fragment slot="right">
@@ -65,8 +71,8 @@
       <h2>Your {siteTitle} link</h2>
       <button class="btn" onclick={copyText}>Copy</button>
     </div>
-    <pre><code>{`${finalLink}`}</code></pre>
-
+    <pre class="output"><code>{`${finalLink}`}</code> <div
+        class="count">{outputCharacterCount} characters</div></pre>
     <div>
       <p>
         <a href={GITHUB_REPO}>Contribute</a>
@@ -116,6 +122,9 @@
     height: 85vh;
     background: #ffffff;
     overflow: hidden;
+  }
+  .left-panel {
+    position: relative;
   }
   .editor {
     background: #001845;
@@ -177,6 +186,18 @@
   .link div button {
     height: fit-content;
     margin-left: auto;
+  }
+  .output {
+    position: relative;
+  }
+  .count {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    padding: 0 0.25rem;
+    font-size: small;
+    color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(0, 0, 0, 0.5);
   }
 
   @media screen and (max-width: 600px) {
