@@ -17,6 +17,7 @@
   const handleInput = () => {
     source = LZString.compressToEncodedURIComponent($patraData);
     inputCharacterCount = $patraData?.length;
+    window.location.hash = source;
   };
 
   onMount(() => {
@@ -25,7 +26,6 @@
   });
 
   const copyText = () => navigator.clipboard.writeText(finalLink);
-
 </script>
 
 <main class="container">
@@ -39,6 +39,7 @@
       </div>
     {/if}
   </header>
+
   <div class="markdown-editor">
     <SplitPane>
       <svelte:fragment slot="left">
