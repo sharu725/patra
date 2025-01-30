@@ -7,7 +7,9 @@ You can share short notes with just a link. No database. No storage!
 - write short articles in **markdown** and share the link!
 - write around **100,000 characters** which is roughly **15k words**.
 - content stored locally. Page **refresh will not lose progress**!
+- works **offline** too!
 - create **tables** as well!
+
 
 |Header 1 |Header 2  | Header 3|
 |-------- | -------- | --------|
