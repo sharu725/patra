@@ -20,11 +20,18 @@
   }
 </script>
 
-<div class="split-pane" on:mousemove={drag} on:mouseup={dragend}>
+<div
+  class="split-pane"
+  on:mousemove={drag}
+  on:mouseup={dragend}
+  role="tabpanel"
+  tabindex="0"
+>
   <div bind:this={left} class="left" style="flex-basis: {leftInitialSize}">
     <slot name="left" />
   </div>
-  <button class="splitter" on:mousedown={dragstart} />
+  <button class="splitter" on:mousedown={dragstart} aria-label="Resize panel"
+  ></button>
   <div class="right">
     <slot name="right" />
   </div>

@@ -2,9 +2,9 @@
   import { SITE_DESCRIPTION, SITE_SHORT_TITLE } from "$lib/constants.js";
   import LZString from "$lib/lz";
   import SvelteMarkdown from "svelte-markdown";
+  import { page } from "$app/state";
 
-  let { data } = $props();
-  const { slug } = data;
+  const slug = page.params.rest;
   const source = LZString.decompressFromEncodedURIComponent(slug);
   let metaTitle = $state("Share Notes");
 

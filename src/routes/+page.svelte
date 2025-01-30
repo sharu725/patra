@@ -1,6 +1,6 @@
 <script>
   import LZString from "$lib/lz";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
   import SvelteMarkdown from "svelte-markdown";
   import SplitPane from "$lib/components/SplitPanes.svelte";
   import { patraData, siteTitle } from "$lib/store";
@@ -9,7 +9,7 @@
   import { onMount } from "svelte";
 
   let source = $state(LZString.compressToEncodedURIComponent($patraData));
-  let finalLink = $derived(`${$page.url.origin}/note/${source}`);
+  let finalLink = $derived(`${page.url.origin}/note/${source}`);
   let isPageLoaded = $state(false);
   let inputCharacterCount = $state(0);
   let outputCharacterCount = $derived(finalLink?.length);
@@ -25,7 +25,6 @@
   });
 
   const copyText = () => navigator.clipboard.writeText(finalLink);
-
 </script>
 
 <main class="container">
@@ -48,7 +47,7 @@
               bind:value={$patraData}
               oninput={handleInput}
               class="source"
-            />
+            ></textarea>
           </div>
           <div class="count">{inputCharacterCount} characters</div>
         </div>
