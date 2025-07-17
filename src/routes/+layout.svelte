@@ -1,14 +1,16 @@
 <script>
-  import { navigating } from "$app/stores";
+  import { navigating } from "$app/state";
   import { SITE_PREVIEW } from "$lib/constants";
   import { fly } from "svelte/transition";
   import "$lib/css/style.css";
+
+  let { children } = $props();
 </script>
 
-{#key $navigating}
-  <div in:fly={{ delay: 100, duration: 500, x: -30 }}>
-    {#if !$navigating}
-      <slot />
+{#key navigating.to}
+  <div in:fly={{ delay: 100, duration: 500, x: 30 }}>
+    {#if !navigating.to}
+      {@render children?.()}
     {/if}
   </div>
 {/key}

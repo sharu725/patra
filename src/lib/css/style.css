@@ -4,9 +4,15 @@
     background-color: #83ba52;
     border: 1px solid #83ba52;
     border-radius: 2px;
-  }
+}
 
-  .btn:hover {
+.btn:hover {
     color: #111;
     background-color: var(--brand-color);
-  }
+}
+
+@media print {
+    .no-print {
+        display: none
+    }
+}

@@ -20,7 +20,6 @@
       }
     });
 
-    // Extract plain text after rendering
     setTimeout(() => {
       if (contentRef) {
         plainText = contentRef.textContent.trim().replace(/\n\s*\n/g, "\n\n");
@@ -74,7 +73,7 @@
     <div bind:this={contentRef}>
       <SvelteMarkdown {source} on:parsed={handleParsed} />
     </div>
-    <div class="home">
+    <div class="home no-print">
       <div class="export-options">
         <button class="btn" onclick={downloadMarkdown}
           >Download as Markdown</button
