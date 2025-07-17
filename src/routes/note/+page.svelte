@@ -1,14 +1,18 @@
 <script>
   import { SITE_DESCRIPTION, SITE_SHORT_TITLE } from "$lib/constants.js";
-  import LZString from "$lib/lz";
   import SvelteMarkdown from "svelte-markdown";
   import { page } from "$app/state";
+  import { onMount } from "svelte";
 
   let slug = $derived(page.url?.hash?.slice(1));
   let metaTitle = $state("Share Notes");
   let plainText = $state("");
-  let source = $derived(LZString.decompressFromEncodedURIComponent(slug));
+  let source = $derived("");
   let contentRef = $state();
+
+  onMount(async () => {
+    source = await decompressFromUrlSafe(slug);
+  });
 
   const handleParsed = (/** @type {{ detail: { tokens: any; }; }} */ event) => {
     const tokens = event.detail.tokens;
@@ -56,6 +60,38 @@
   function printToPDF() {
     window.print();
   }
+
+  async function decompressFromUrlSafe(compressedStr) {
+    const base64 =
+      compressedStr.replace(/-/g, "+").replace(/_/g, "/") +
+      "=".repeat((4 - (compressedStr.length % 4)) % 4);
+    const binaryStr = atob(base64);
+    const len = binaryStr.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryStr.charCodeAt(i);
+    }
+
+    const decompressionStream = new DecompressionStream("gzip"); // Match the format used in compression
+    const decompressedReadableStream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(bytes);
+        controller.close();
+      },
+    }).pipeThrough(decompressionStream);
+
+    const reader = decompressedReadableStream.getReader();
+    const chunks = [];
+    let done, value;
+    while (!done) {
+      ({ done, value } = await reader.read());
+      if (value) chunks.push(value);
+    }
+    const decompressedData = new Uint8Array(
+      await new Blob(chunks).arrayBuffer()
+    );
+    return new TextDecoder().decode(decompressedData);
+  }
 </script>
 
 <div class="preview">
@@ -70,6 +106,9 @@
       <a href="/"> Back </a>
     </div>
   {:else}
+    <div class="home no-print">
+      <a href="/"> Back </a>
+    </div>
     <div bind:this={contentRef}>
       <SvelteMarkdown {source} on:parsed={handleParsed} />
     </div>

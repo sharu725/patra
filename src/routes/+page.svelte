@@ -1,5 +1,4 @@
 <script>
-  import LZString from "$lib/lz";
   import { page } from "$app/state";
   import SvelteMarkdown from "svelte-markdown";
   import SplitPane from "$lib/components/SplitPanes.svelte";
@@ -9,23 +8,49 @@
   import { onMount } from "svelte";
   import Analytics from "$lib/Analytics.svelte";
 
-  let source = $state(LZString.compressToEncodedURIComponent($patraData));
+  let source = $state("");
   let finalLink = $derived(`${page.url.origin}/note#${source}`);
   let isPageLoaded = $state(false);
   let inputCharacterCount = $state(0);
   let outputCharacterCount = $derived(finalLink?.length);
 
-  const handleInput = () => {
-    source = LZString.compressToEncodedURIComponent($patraData);
+  const handleInput = async () => {
+    source = await compressToUrlSafe($patraData);
     inputCharacterCount = $patraData?.length;
   };
 
-  onMount(() => {
+  onMount(async () => {
     isPageLoaded = true;
     inputCharacterCount = $patraData?.length;
+    source = await compressToUrlSafe($patraData);
   });
 
   const copyText = () => navigator.clipboard.writeText(finalLink);
+
+  async function compressToUrlSafe(text) {
+    const encoder = new TextEncoder();
+    const inputStream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(encoder.encode(text));
+        controller.close();
+      },
+    });
+
+    const compressionStream = new CompressionStream("gzip"); // or 'deflate'
+    const compressedReadableStream = inputStream.pipeThrough(compressionStream);
+
+    const reader = compressedReadableStream.getReader();
+    const chunks = [];
+    let done, value;
+    while (!done) {
+      ({ done, value } = await reader.read());
+      if (value) chunks.push(value);
+    }
+    const compressedData = new Uint8Array(await new Blob(chunks).arrayBuffer());
+
+    const base64 = btoa(String.fromCharCode(...compressedData));
+    return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+  }
 </script>
 
 <main class="container">
