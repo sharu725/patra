@@ -2,11 +2,17 @@
   import { SITE_DESCRIPTION, SITE_SHORT_TITLE } from "$lib/constants.js";
   import LZString from "$lib/lz";
   import SvelteMarkdown from "svelte-markdown";
+  import { onMount } from "svelte";
   import { page } from "$app/state";
 
-  const slug = page.params.rest;
-  const source = LZString.decompressFromEncodedURIComponent(slug);
+  let slug = $state("");
   let metaTitle = $state("Share Notes");
+
+  onMount(() => {
+    slug = window.location.hash.slice(1);
+  });
+
+  let source = $derived(LZString.decompressFromEncodedURIComponent(slug));
 
   const handleParsed = (/** @type {{ detail: { tokens: any; }; }} */ event) => {
     const tokens = event.detail.tokens;

@@ -37,8 +37,7 @@ You can share short notes with just a link. No database. No storage!
 <p>Highlight code blocks</p>
 \`\`\`
 
-The note will remain until overwritten.    
-`;
+The note will remain until overwritten.`;
 export const patraData = writable(
   (browser && localStorage.getItem("patraData")) || defaultValue
 );

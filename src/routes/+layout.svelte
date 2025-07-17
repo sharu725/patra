@@ -2,6 +2,7 @@
   import { navigating } from "$app/stores";
   import { SITE_PREVIEW } from "$lib/constants";
   import { fly } from "svelte/transition";
+  import "$lib/css/style.css";
 </script>
 
 {#key $navigating}

@@ -1,0 +1,1228 @@
+===== src/service-worker.js =====
+/// <reference types="@sveltejs/kit" />
+import { build, files, version } from "$service-worker";
+
+// Create a unique cache name for this deployment
+const CACHE = `cache-${version}`;
+
+const ASSETS = [
+  ...build, // the app itself
+  ...files, // everything in `static`
+];
+
+self.addEventListener("install", (event) => {
+  // Create a new cache and add all files to it
+  async function addFilesToCache() {
+    const cache = await caches.open(CACHE);
+    await cache.addAll(ASSETS);
+  }
+
+  event.waitUntil(addFilesToCache());
+});
+
+self.addEventListener("activate", (event) => {
+  // Remove previous cached data from disk
+  async function deleteOldCaches() {
+    for (const key of await caches.keys()) {
+      if (key !== CACHE) await caches.delete(key);
+    }
+  }
+
+  event.waitUntil(deleteOldCaches());
+});
+
+self.addEventListener("fetch", (event) => {
+  // ignore POST requests etc
+  if (event.request.method !== "GET") return;
+
+  async function respond() {
+    const url = new URL(event.request.url);
+    const cache = await caches.open(CACHE);
+
+    // `build`/`files` can always be served from the cache
+    if (ASSETS.includes(url.pathname)) {
+      const response = await cache.match(url.pathname);
+
+      if (response) {
+        return response;
+      }
+    }
+
+    // for everything else, try the network first, but
+    // fall back to the cache if we're offline
+    try {
+      const response = await fetch(event.request);
+
+      // if we're offline, fetch can return a value that is not a Response
+      // instead of throwing - and we can't pass this non-Response to respondWith
+      if (!(response instanceof Response)) {
+        throw new Error("invalid response from fetch");
+      }
+
+      if (response.status === 200) {
+        cache.put(event.request, response.clone());
+      }
+
+      return response;
+    } catch (err) {
+      const response = await cache.match(event.request);
+
+      if (response) {
+        return response;
+      }
+
+      // if there's no cache, then just error out
+      // as there is nothing we can do to respond to this request
+      throw err;
+    }
+  }
+
+  event.respondWith(respond());
+});
+
+
+
+===== src/routes/+layout.svelte =====
+<script>
+  import { navigating } from "$app/stores";
+  import { SITE_PREVIEW } from "$lib/constants";
+  import { fly } from "svelte/transition";
+</script>
+
+{#key $navigating}
+  <div in:fly={{ delay: 100, duration: 500, x: -30 }}>
+    {#if !$navigating}
+      <slot />
+    {/if}
+  </div>
+{/key}
+
+<svelte:head>
+  <meta property="og:image" content={SITE_PREVIEW} />
+</svelte:head>
+
+
+
+===== src/routes/+page.svelte =====
+<script>
+  import LZString from "$lib/lz";
+  import { page } from "$app/state";
+  import SvelteMarkdown from "svelte-markdown";
+  import SplitPane from "$lib/components/SplitPanes.svelte";
+  import { patraData, siteTitle } from "$lib/store";
+  import { dev } from "$app/environment";
+  import { GITHUB_REPO, SITE_DESCRIPTION, SITE_TITLE } from "$lib/constants";
+  import { onMount } from "svelte";
+
+  let source = $state(LZString.compressToEncodedURIComponent($patraData));
+  let finalLink = $derived(`${page.url.origin}/note/${source}`);
+  let isPageLoaded = $state(false);
+  let inputCharacterCount = $state(0);
+  let outputCharacterCount = $derived(finalLink?.length);
+
+  const handleInput = () => {
+    source = LZString.compressToEncodedURIComponent($patraData);
+    inputCharacterCount = $patraData?.length;
+  };
+
+  onMount(() => {
+    isPageLoaded = true;
+    inputCharacterCount = $patraData?.length;
+  });
+
+  const copyText = () => navigator.clipboard.writeText(finalLink);
+</script>
+
+<main class="container">
+  <header class="header">
+    <a href="/">
+      <h1 class="header-title">{siteTitle}</h1>
+    </a>
+    {#if isPageLoaded}
+      <div class="preview-link">
+        <a class="btn" href={finalLink}> Preview </a>
+      </div>
+    {/if}
+  </header>
+  <div class="markdown-editor">
+    <SplitPane>
+      <svelte:fragment slot="left">
+        <div class="left-panel">
+          <div class="editor">
+            <textarea
+              bind:value={$patraData}
+              oninput={handleInput}
+              class="source"
+            ></textarea>
+          </div>
+          <div class="count">{inputCharacterCount} characters</div>
+        </div>
+      </svelte:fragment>
+      <svelte:fragment slot="right">
+        <div class="right-panel">
+          <div class="output">
+            <div class="output-content">
+              {#key $patraData}
+                <SvelteMarkdown source={$patraData} />
+              {/key}
+            </div>
+          </div>
+        </div>
+      </svelte:fragment>
+    </SplitPane>
+  </div>
+  <div class="link">
+    <div>
+      <h2>Your {siteTitle} link</h2>
+      <button class="btn" onclick={copyText}>Copy</button>
+    </div>
+    <pre class="output"><code>{`${finalLink}`}</code> <div
+        class="count">{outputCharacterCount} characters</div></pre>
+    <div>
+      <p>
+        <a href={GITHUB_REPO}>Contribute</a>
+      </p>
+    </div>
+  </div>
+</main>
+<svelte:head>
+  <title>{SITE_TITLE}</title>
+  <meta name="description" content={SITE_DESCRIPTION} />
+  {#if !dev}
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-Q1KNZ1DXGT");
+    </script>
+  {/if}
+</svelte:head>
+
+<style>
+  .header {
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    font-weight: semibold;
+  }
+  .header a {
+    text-decoration: none;
+    color: inherit;
+  }
+  .preview-link {
+    margin-left: auto;
+  }
+  .header-title {
+    text-transform: capitalize;
+    margin: 0;
+  }
+  .markdown-editor {
+    width: 100%;
+  }
+  .left-panel,
+  .right-panel {
+    border: solid 1px rgb(84, 84, 84);
+    height: 85vh;
+    background: #ffffff;
+    overflow: hidden;
+  }
+  .left-panel {
+    position: relative;
+  }
+  .editor {
+    background: #001845;
+    height: 100%;
+  }
+
+  textarea {
+    font-size: 18px;
+    padding: 1rem;
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .right-panel {
+    font-size: 18px;
+    overflow: auto;
+  }
+
+  .source {
+    border: none;
+    width: 100%;
+    height: 100%;
+    background: #001845;
+    color: #61cb04;
+  }
+  .source:focus {
+    outline: none;
+  }
+  .output {
+    width: 100%;
+  }
+  .output-content {
+    padding: 1rem;
+  }
+
+  .btn {
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    background-color: #83ba52;
+    border: 1px solid #83ba52;
+    border-radius: 2px;
+  }
+
+  .btn:hover {
+    color: #111;
+    background-color: var(--brand-color);
+  }
+
+  .link {
+    margin: 1rem;
+  }
+  .link h2 {
+    margin-bottom: 0;
+  }
+  .link div {
+    display: flex;
+    place-items: center;
+  }
+  .link div button {
+    height: fit-content;
+    margin-left: auto;
+  }
+  .output {
+    position: relative;
+  }
+  .count {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    padding: 0 0.25rem;
+    font-size: small;
+    color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  @media screen and (max-width: 600px) {
+    .markdown-editor {
+      grid-template-columns: 1fr;
+    }
+
+    .right-panel {
+      display: none;
+    }
+  }
+</style>
+
+
+
+===== src/routes/note/[...rest]/+page.svelte =====
+<script>
+  import { SITE_DESCRIPTION, SITE_SHORT_TITLE } from "$lib/constants.js";
+  import LZString from "$lib/lz";
+  import SvelteMarkdown from "svelte-markdown";
+  import { onMount } from "svelte";
+
+  let slug = $state("");
+  let metaTitle = $state("Share Notes");
+
+  onMount(() => {
+    slug = window.location.hash.slice(1);
+  });
+
+  let source = $derived(LZString.decompressFromEncodedURIComponent(slug));
+
+  const handleParsed = (/** @type {{ detail: { tokens: any; }; }} */ event) => {
+    const tokens = event.detail.tokens;
+    let index = 0;
+    tokens.map(({ text }) => {
+      if (text && !index) {
+        index++;
+        metaTitle = text;
+      }
+    });
+  };
+</script>
+
+<div class="preview">
+  {#if slug != "Q" && !source}
+    <h1>Not a valid URL.</h1>
+  {:else}
+    <SvelteMarkdown {source} on:parsed={handleParsed} />
+  {/if}
+  <div class="home">
+    <a href="/"> Back </a>
+  </div>
+</div>
+
+<svelte:head>
+  <title>{metaTitle ?? SITE_SHORT_TITLE}</title>
+  <meta name="description" content={SITE_DESCRIPTION} />
+</svelte:head>
+
+<style>
+  .preview {
+    display: flex;
+    flex-direction: column;
+    max-width: 800px;
+    margin: 2rem auto;
+  }
+  .home {
+    margin-top: auto;
+  }
+  @media screen and (max-width: 600px) {
+    .preview {
+      margin: 1rem auto;
+      padding: 0 1em;
+    }
+  }
+</style>
+
+
+
+===== src/routes/note/+page.svelte =====
+<div class="preview">
+  <h2>Content is empty.</h2>
+  <div>
+    <a href="/"> Back to app </a>
+  </div>
+</div>
+
+<style>
+  h2 {
+    color: red;
+  }
+</style>
+
+
+
+===== src/routes/+error.svelte =====
+<script>
+  import { SITE_DESCRIPTION, SITE_SHORT_TITLE } from "$lib/constants";
+</script>
+
+<div class="preview">
+  <h1>What is this link?</h1>
+  <p>something is wrong! Please check the URL again.</p>
+  <div class="home">
+    <a href="/"> Back </a>
+  </div>
+</div>
+
+<svelte:head>
+  <title>{SITE_SHORT_TITLE} | Error</title>
+  <meta name="description" content={SITE_DESCRIPTION} />
+</svelte:head>
+
+
+
+===== src/app.d.ts =====
+// See https://kit.svelte.dev/docs/types#app
+// for information about these interfaces
+// and what to do when importing types
+declare namespace App {
+	// interface Locals {}
+	// interface Platform {}
+	// interface PrivateEnv {}
+	// interface PublicEnv {}
+}
+
+
+
+===== src/app.html =====
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%sveltekit.assets%/favicon.ico" />
+    <meta name="viewport" content="width=device-width" />
+    %sveltekit.head%
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="apple-touch-icon-precomposed"
+      sizes="180x180"
+      href="/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="192x192"
+      href="/android-chrome-192x192.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="512x512"
+      href="/android-chrome-512x512.png"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "JetBrains Mono", monospace;
+        --brand-color: #67993b;
+      }
+
+      .output-content *,
+      .preview * {
+        max-width: 100%;
+      }
+
+      .preview {
+        max-width: 80%;
+        margin: 2rem auto;
+      }
+
+      blockquote {
+        padding-left: 1em;
+        margin-left: 1rem;
+        font-style: italic;
+        border-left: 2px solid var(--brand-color);
+      }
+
+      pre {
+        padding: 1rem;
+        white-space: pre-wrap;
+        word-break: break-all;
+        background-color: rgb(200, 249, 168);
+        border-radius: 0.25rem;
+        border: 1px dashed green;
+      }
+
+      table {
+        margin-bottom: 1rem;
+        width: 100%;
+        border: 0 solid #999;
+        border-collapse: collapse;
+      }
+
+      td,
+      th {
+        padding: 0.25rem 0.5rem;
+        border-color: inherit;
+        padding: 0.25rem 0.5rem;
+        border: 1px solid #e5e5e5;
+      }
+
+      thead th {
+        border-bottom-color: #999;
+      }
+
+      tbody tr:nth-child(odd) td,
+      tbody tr:nth-child(odd) th {
+        background-color: #f9f9f9;
+      }
+    </style>
+    <!-- Google tag (gtag.js) -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-Q1KNZ1DXGT"
+    ></script>
+  </head>
+
+  <body data-sveltekit-preload-data="hover">
+    <div>%sveltekit.body%</div>
+  </body>
+</html>
+
+
+
+===== src/lib/store.js =====
+import { writable } from "svelte/store";
+import { browser } from "$app/environment";
+
+export const defaultValue = `## Patra | Share your notes!
+You can share short notes with just a link. No database. No storage!
+
+- write short articles in **markdown** and share the link!
+- write around **100,000 characters** which is roughly **15k words**.
+- content stored locally. Page **refresh will not lose progress**!
+- works **offline** too!
+- create **tables** as well!
+
+
+|Header 1 |Header 2  | Header 3|
+|-------- | -------- | --------|
+| data 1  | data 2   |  data 3 |
+| data 11 | data 12  |  data 13|
+
+- embed maps
+
+
+<iframe style="border:0; display:block; width:100%" src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d2664.642326877131!2d76.59443713513481!3d12.366147804839871!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2sin!4v1712681027838!5m2!1sen!2sin" height="450"  allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+- check the link generated at the bottom.
+
+### Features
+- markdown support
+- light-weight
+- SSR by default
+
+### Use this as a Todo list app
+
+- ~do a thing~
+- do another thing
+
+\`\`\`html
+<p>Highlight code blocks</p>
+\`\`\`
+
+The note will remain until overwritten.    
+`;
+export const patraData = writable(
+  (browser && localStorage.getItem("patraData")) || defaultValue
+);
+
+patraData.subscribe((val) => browser && (localStorage.patraData = val));
+
+export const siteTitle = "Patra";
+
+
+
+===== src/lib/components/SplitPanes.svelte =====
+<script>
+  export let leftInitialSize = "50%";
+
+  let left;
+  let isDragging = false;
+
+  function dragstart() {
+    isDragging = true;
+  }
+
+  function drag(e) {
+    if (!isDragging) return;
+    const elementLeft = left.getBoundingClientRect().left;
+    left.style.flexBasis = e.clientX - elementLeft + "px";
+  }
+
+  function dragend() {
+    if (!isDragging) return;
+    isDragging = false;
+  }
+</script>
+
+<div
+  class="split-pane"
+  on:mousemove={drag}
+  on:mouseup={dragend}
+  role="tabpanel"
+  tabindex="0"
+>
+  <div bind:this={left} class="left" style="flex-basis: {leftInitialSize}">
+    <slot name="left" />
+  </div>
+  <button class="splitter" on:mousedown={dragstart} aria-label="Resize panel"
+  ></button>
+  <div class="right">
+    <slot name="right" />
+  </div>
+</div>
+
+<style>
+  .splitter {
+    padding: 0;
+    border: none;
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 0px;
+    cursor: col-resize;
+    border-right: 4px dashed #001845;
+  }
+
+  .split-pane {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .split-pane > div {
+    display: block;
+  }
+
+  .left {
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+
+  .right {
+    flex-grow: 1;
+    flex-shrink: 1;
+    overflow-x: auto;
+  }
+  @media screen and (max-width: 600px) {
+    .split-pane {
+      display: block;
+    }
+  }
+</style>
+
+
+
+===== src/lib/lz.js =====
+// Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
+// This work is free. You can redistribute it and/or modify it
+// under the terms of the WTFPL, Version 2
+// For more information see LICENSE.txt or http://www.wtfpl.net/
+//
+// For more information, the home page:
+// http://pieroxy.net/blog/pages/lz-string/testing.html
+//
+// LZ-based compression algorithm, version 1.4.4
+var LZString = (function () {
+  // private property
+  var f = String.fromCharCode;
+  var keyStrBase64 =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+  var keyStrUriSafe =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$";
+  var baseReverseDic = {};
+
+  function getBaseValue(alphabet, character) {
+    if (!baseReverseDic[alphabet]) {
+      baseReverseDic[alphabet] = {};
+      for (var i = 0; i < alphabet.length; i++) {
+        baseReverseDic[alphabet][alphabet.charAt(i)] = i;
+      }
+    }
+    return baseReverseDic[alphabet][character];
+  }
+
+  var LZString = {
+    // compressToBase64: function (input) {
+    //   if (input == null) return "";
+    //   var res = LZString._compress(input, 6, function (a) {
+    //     return keyStrBase64.charAt(a);
+    //   });
+    //   switch (
+    //     res.length % 4 // To produce valid Base64
+    //   ) {
+    //     default: // When could this happen ?
+    //     case 0:
+    //       return res;
+    //     case 1:
+    //       return res + "===";
+    //     case 2:
+    //       return res + "==";
+    //     case 3:
+    //       return res + "=";
+    //   }
+    // },
+
+    // decompressFromBase64: function (input) {
+    //   if (input == null) return "";
+    //   if (input == "") return null;
+    //   return LZString._decompress(input.length, 32, function (index) {
+    //     return getBaseValue(keyStrBase64, input.charAt(index));
+    //   });
+    // },
+
+    // compressToUTF16: function (input) {
+    //   if (input == null) return "";
+    //   return (
+    //     LZString._compress(input, 15, function (a) {
+    //       return f(a + 32);
+    //     }) + " "
+    //   );
+    // },
+
+    // decompressFromUTF16: function (compressed) {
+    //   if (compressed == null) return "";
+    //   if (compressed == "") return null;
+    //   return LZString._decompress(compressed.length, 16384, function (index) {
+    //     return compressed.charCodeAt(index) - 32;
+    //   });
+    // },
+
+    //compress into uint8array (UCS-2 big endian format)
+    // compressToUint8Array: function (uncompressed) {
+    //   var compressed = LZString.compress(uncompressed);
+    //   var buf = new Uint8Array(compressed.length * 2); // 2 bytes per character
+
+    //   for (var i = 0, TotalLen = compressed.length; i < TotalLen; i++) {
+    //     var current_value = compressed.charCodeAt(i);
+    //     buf[i * 2] = current_value >>> 8;
+    //     buf[i * 2 + 1] = current_value % 256;
+    //   }
+    //   return buf;
+    // },
+
+    //decompress from uint8array (UCS-2 big endian format)
+    // decompressFromUint8Array: function (compressed) {
+    //   if (compressed === null || compressed === undefined) {
+    //     return LZString.decompress(compressed);
+    //   } else {
+    //     var buf = new Array(compressed.length / 2); // 2 bytes per character
+    //     for (var i = 0, TotalLen = buf.length; i < TotalLen; i++) {
+    //       buf[i] = compressed[i * 2] * 256 + compressed[i * 2 + 1];
+    //     }
+
+    //     var result = [];
+    //     buf.forEach(function (c) {
+    //       result.push(f(c));
+    //     });
+    //     return LZString.decompress(result.join(""));
+    //   }
+    // },
+
+    //compress into a string that is already URI encoded
+    compressToEncodedURIComponent: function (input) {
+      if (input == null) return "";
+      return LZString._compress(input, 6, function (a) {
+        return keyStrUriSafe.charAt(a);
+      });
+    },
+
+    //decompress from an output of compressToEncodedURIComponent
+    decompressFromEncodedURIComponent: function (input) {
+      if (input == null) return "";
+      if (input == "") return null;
+      input = input.replace(/ /g, "+");
+      return LZString._decompress(input.length, 32, function (index) {
+        return getBaseValue(keyStrUriSafe, input.charAt(index));
+      });
+    },
+
+    compress: function (uncompressed) {
+      return LZString._compress(uncompressed, 16, function (a) {
+        return f(a);
+      });
+    },
+    _compress: function (uncompressed, bitsPerChar, getCharFromInt) {
+      if (uncompressed == null) return "";
+      var i,
+        value,
+        context_dictionary = {},
+        context_dictionaryToCreate = {},
+        context_c = "",
+        context_wc = "",
+        context_w = "",
+        context_enlargeIn = 2, // Compensate for the first entry which should not count
+        context_dictSize = 3,
+        context_numBits = 2,
+        context_data = [],
+        context_data_val = 0,
+        context_data_position = 0,
+        ii;
+
+      for (ii = 0; ii < uncompressed.length; ii += 1) {
+        context_c = uncompressed.charAt(ii);
+        if (
+          !Object.prototype.hasOwnProperty.call(context_dictionary, context_c)
+        ) {
+          context_dictionary[context_c] = context_dictSize++;
+          context_dictionaryToCreate[context_c] = true;
+        }
+
+        context_wc = context_w + context_c;
+        if (
+          Object.prototype.hasOwnProperty.call(context_dictionary, context_wc)
+        ) {
+          context_w = context_wc;
+        } else {
+          if (
+            Object.prototype.hasOwnProperty.call(
+              context_dictionaryToCreate,
+              context_w
+            )
+          ) {
+            if (context_w.charCodeAt(0) < 256) {
+              for (i = 0; i < context_numBits; i++) {
+                context_data_val = context_data_val << 1;
+                if (context_data_position == bitsPerChar - 1) {
+                  context_data_position = 0;
+                  context_data.push(getCharFromInt(context_data_val));
+                  context_data_val = 0;
+                } else {
+                  context_data_position++;
+                }
+              }
+              value = context_w.charCodeAt(0);
+              for (i = 0; i < 8; i++) {
+                context_data_val = (context_data_val << 1) | (value & 1);
+                if (context_data_position == bitsPerChar - 1) {
+                  context_data_position = 0;
+                  context_data.push(getCharFromInt(context_data_val));
+                  context_data_val = 0;
+                } else {
+                  context_data_position++;
+                }
+                value = value >> 1;
+              }
+            } else {
+              value = 1;
+              for (i = 0; i < context_numBits; i++) {
+                context_data_val = (context_data_val << 1) | value;
+                if (context_data_position == bitsPerChar - 1) {
+                  context_data_position = 0;
+                  context_data.push(getCharFromInt(context_data_val));
+                  context_data_val = 0;
+                } else {
+                  context_data_position++;
+                }
+                value = 0;
+              }
+              value = context_w.charCodeAt(0);
+              for (i = 0; i < 16; i++) {
+                context_data_val = (context_data_val << 1) | (value & 1);
+                if (context_data_position == bitsPerChar - 1) {
+                  context_data_position = 0;
+                  context_data.push(getCharFromInt(context_data_val));
+                  context_data_val = 0;
+                } else {
+                  context_data_position++;
+                }
+                value = value >> 1;
+              }
+            }
+            context_enlargeIn--;
+            if (context_enlargeIn == 0) {
+              context_enlargeIn = Math.pow(2, context_numBits);
+              context_numBits++;
+            }
+            delete context_dictionaryToCreate[context_w];
+          } else {
+            value = context_dictionary[context_w];
+            for (i = 0; i < context_numBits; i++) {
+              context_data_val = (context_data_val << 1) | (value & 1);
+              if (context_data_position == bitsPerChar - 1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = value >> 1;
+            }
+          }
+          context_enlargeIn--;
+          if (context_enlargeIn == 0) {
+            context_enlargeIn = Math.pow(2, context_numBits);
+            context_numBits++;
+          }
+          // Add wc to the dictionary.
+          context_dictionary[context_wc] = context_dictSize++;
+          context_w = String(context_c);
+        }
+      }
+
+      // Output the code for w.
+      if (context_w !== "") {
+        if (
+          Object.prototype.hasOwnProperty.call(
+            context_dictionaryToCreate,
+            context_w
+          )
+        ) {
+          if (context_w.charCodeAt(0) < 256) {
+            for (i = 0; i < context_numBits; i++) {
+              context_data_val = context_data_val << 1;
+              if (context_data_position == bitsPerChar - 1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+            }
+            value = context_w.charCodeAt(0);
+            for (i = 0; i < 8; i++) {
+              context_data_val = (context_data_val << 1) | (value & 1);
+              if (context_data_position == bitsPerChar - 1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = value >> 1;
+            }
+          } else {
+            value = 1;
+            for (i = 0; i < context_numBits; i++) {
+              context_data_val = (context_data_val << 1) | value;
+              if (context_data_position == bitsPerChar - 1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = 0;
+            }
+            value = context_w.charCodeAt(0);
+            for (i = 0; i < 16; i++) {
+              context_data_val = (context_data_val << 1) | (value & 1);
+              if (context_data_position == bitsPerChar - 1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = value >> 1;
+            }
+          }
+          context_enlargeIn--;
+          if (context_enlargeIn == 0) {
+            context_enlargeIn = Math.pow(2, context_numBits);
+            context_numBits++;
+          }
+          delete context_dictionaryToCreate[context_w];
+        } else {
+          value = context_dictionary[context_w];
+          for (i = 0; i < context_numBits; i++) {
+            context_data_val = (context_data_val << 1) | (value & 1);
+            if (context_data_position == bitsPerChar - 1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = value >> 1;
+          }
+        }
+        context_enlargeIn--;
+        if (context_enlargeIn == 0) {
+          context_enlargeIn = Math.pow(2, context_numBits);
+          context_numBits++;
+        }
+      }
+
+      // Mark the end of the stream
+      value = 2;
+      for (i = 0; i < context_numBits; i++) {
+        context_data_val = (context_data_val << 1) | (value & 1);
+        if (context_data_position == bitsPerChar - 1) {
+          context_data_position = 0;
+          context_data.push(getCharFromInt(context_data_val));
+          context_data_val = 0;
+        } else {
+          context_data_position++;
+        }
+        value = value >> 1;
+      }
+
+      // Flush the last char
+      while (true) {
+        context_data_val = context_data_val << 1;
+        if (context_data_position == bitsPerChar - 1) {
+          context_data.push(getCharFromInt(context_data_val));
+          break;
+        } else context_data_position++;
+      }
+      return context_data.join("");
+    },
+
+    decompress: function (compressed) {
+      if (compressed == null) return "";
+      if (compressed == "") return null;
+      return LZString._decompress(compressed.length, 32768, function (index) {
+        return compressed.charCodeAt(index);
+      });
+    },
+
+    _decompress: function (length, resetValue, getNextValue) {
+      var dictionary = [],
+        next,
+        enlargeIn = 4,
+        dictSize = 4,
+        numBits = 3,
+        entry = "",
+        result = [],
+        i,
+        w,
+        bits,
+        resb,
+        maxpower,
+        power,
+        c,
+        data = { val: getNextValue(0), position: resetValue, index: 1 };
+
+      for (i = 0; i < 3; i += 1) {
+        dictionary[i] = i;
+      }
+
+      bits = 0;
+      maxpower = Math.pow(2, 2);
+      power = 1;
+      while (power != maxpower) {
+        resb = data.val & data.position;
+        data.position >>= 1;
+        if (data.position == 0) {
+          data.position = resetValue;
+          data.val = getNextValue(data.index++);
+        }
+        bits |= (resb > 0 ? 1 : 0) * power;
+        power <<= 1;
+      }
+
+      switch ((next = bits)) {
+        case 0:
+          bits = 0;
+          maxpower = Math.pow(2, 8);
+          power = 1;
+          while (power != maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+              data.position = resetValue;
+              data.val = getNextValue(data.index++);
+            }
+            bits |= (resb > 0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+          c = f(bits);
+          break;
+        case 1:
+          bits = 0;
+          maxpower = Math.pow(2, 16);
+          power = 1;
+          while (power != maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+              data.position = resetValue;
+              data.val = getNextValue(data.index++);
+            }
+            bits |= (resb > 0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+          c = f(bits);
+          break;
+        case 2:
+          return "";
+      }
+      dictionary[3] = c;
+      w = c;
+      result.push(c);
+      while (true) {
+        if (data.index > length) {
+          return "";
+        }
+
+        bits = 0;
+        maxpower = Math.pow(2, numBits);
+        power = 1;
+        while (power != maxpower) {
+          resb = data.val & data.position;
+          data.position >>= 1;
+          if (data.position == 0) {
+            data.position = resetValue;
+            data.val = getNextValue(data.index++);
+          }
+          bits |= (resb > 0 ? 1 : 0) * power;
+          power <<= 1;
+        }
+
+        switch ((c = bits)) {
+          case 0:
+            bits = 0;
+            maxpower = Math.pow(2, 8);
+            power = 1;
+            while (power != maxpower) {
+              resb = data.val & data.position;
+              data.position >>= 1;
+              if (data.position == 0) {
+                data.position = resetValue;
+                data.val = getNextValue(data.index++);
+              }
+              bits |= (resb > 0 ? 1 : 0) * power;
+              power <<= 1;
+            }
+
+            dictionary[dictSize++] = f(bits);
+            c = dictSize - 1;
+            enlargeIn--;
+            break;
+          case 1:
+            bits = 0;
+            maxpower = Math.pow(2, 16);
+            power = 1;
+            while (power != maxpower) {
+              resb = data.val & data.position;
+              data.position >>= 1;
+              if (data.position == 0) {
+                data.position = resetValue;
+                data.val = getNextValue(data.index++);
+              }
+              bits |= (resb > 0 ? 1 : 0) * power;
+              power <<= 1;
+            }
+            dictionary[dictSize++] = f(bits);
+            c = dictSize - 1;
+            enlargeIn--;
+            break;
+          case 2:
+            return result.join("");
+        }
+
+        if (enlargeIn == 0) {
+          enlargeIn = Math.pow(2, numBits);
+          numBits++;
+        }
+
+        if (dictionary[c]) {
+          entry = dictionary[c];
+        } else {
+          if (c === dictSize) {
+            entry = w + w.charAt(0);
+          } else {
+            return null;
+          }
+        }
+        result.push(entry);
+
+        // Add w+entry[0] to the dictionary.
+        dictionary[dictSize++] = w + entry.charAt(0);
+        enlargeIn--;
+
+        w = entry;
+
+        if (enlargeIn == 0) {
+          enlargeIn = Math.pow(2, numBits);
+          numBits++;
+        }
+      }
+    },
+  };
+  return LZString;
+})();
+
+if (typeof define === "function" && define.amd) {
+  define(function () {
+    return LZString;
+  });
+} else if (typeof module !== "undefined" && module != null) {
+  module.exports = LZString;
+} else if (typeof angular !== "undefined" && angular != null) {
+  angular.module("LZString", []).factory("LZString", function () {
+    return LZString;
+  });
+}
+
+export default LZString;
+
+
+
+===== src/lib/constants.js =====
+export const SITE_SHORT_TITLE = "Patra";
+export const SITE_URL = "https://patra.webjeda.com";
+export const SITE_TITLE = "Patra | Shareable note";
+export const SITE_DESCRIPTION =
+  "Share your note with anyone through a link, no database, no storage.";
+export const GITHUB_REPO = "https://github.com/sharu725/patra";
+export const SITE_PREVIEW = `${SITE_URL}/patra-preview.png`;
+
+
+

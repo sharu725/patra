@@ -7,9 +7,10 @@
   import { dev } from "$app/environment";
   import { GITHUB_REPO, SITE_DESCRIPTION, SITE_TITLE } from "$lib/constants";
   import { onMount } from "svelte";
+  import Analytics from "$lib/Analytics.svelte";
 
   let source = $state(LZString.compressToEncodedURIComponent($patraData));
-  let finalLink = $derived(`${page.url.origin}/note/${source}`);
+  let finalLink = $derived(`${page.url.origin}/note#${source}`);
   let isPageLoaded = $state(false);
   let inputCharacterCount = $state(0);
   let outputCharacterCount = $derived(finalLink?.length);
@@ -79,6 +80,7 @@
     </div>
   </div>
 </main>
+<Analytics />
 <svelte:head>
   <title>{SITE_TITLE}</title>
   <meta name="description" content={SITE_DESCRIPTION} />
@@ -157,19 +159,6 @@
   }
   .output-content {
     padding: 1rem;
-  }
-
-  .btn {
-    padding: 0.25rem 0.5rem;
-    cursor: pointer;
-    background-color: #83ba52;
-    border: 1px solid #83ba52;
-    border-radius: 2px;
-  }
-
-  .btn:hover {
-    color: #111;
-    background-color: var(--brand-color);
   }
 
   .link {
