@@ -83,10 +83,6 @@
 </div>
 
 <style>
-  .tabs-container {
-    /* Remove bottom border */
-  }
-
   .tabs-header {
     display: flex;
     align-items: center;
