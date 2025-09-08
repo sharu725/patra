@@ -48,7 +48,9 @@
     }
   });
 
-  const copyText = () => navigator.clipboard.writeText(finalLink);
+  const copyText = () => {
+    navigator.clipboard.writeText(finalLink);
+  };
 
   async function compressToUrlSafe(text: string) {
     const encoder = new TextEncoder();

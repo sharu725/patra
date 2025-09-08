@@ -99,8 +99,8 @@
   .tab {
     display: flex;
     align-items: center;
-    min-width: 30px;
-    max-width: 60px;
+    min-width: 60px;
+    max-width: 120px;
     padding: 4px 2px;
     border-right: 1px solid #ddd;
     background: #e0e0e0;
@@ -184,8 +184,8 @@
     }
 
     .tab {
-      min-width: 25px;
-      max-width: 50px;
+      min-width: 50px;
+      max-width: 100px;
     }
 
     .tab-title {
