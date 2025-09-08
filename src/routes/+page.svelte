@@ -7,17 +7,22 @@
   import { GITHUB_REPO, SITE_DESCRIPTION, SITE_TITLE } from "$lib/constants";
   import { onMount } from "svelte";
   import Analytics from "$lib/Analytics.svelte";
-  import { tabs_data, tabHelpers } from "$lib/tabs_store.svelte";
+  import { tabHelpers } from "$lib/tabs_store.svelte";
 
   let source = $state("");
   let finalLink = $derived(`${page.url.origin}/note#${source}`);
   let isPageLoaded = $state(false);
   let inputCharacterCount = $state(0);
   let outputCharacterCount = $derived(finalLink?.length);
+  let isZenMode = $state(false);
 
   // Get the active tab content
   let activeTab = $derived(tabHelpers.getActiveTab());
   let activeContent = $derived(activeTab?.content || "");
+
+  const toggleZenMode = () => {
+    isZenMode = !isZenMode;
+  };
 
   const handleInput = async (event: Event) => {
     const target = event.target as HTMLTextAreaElement;
@@ -78,23 +83,35 @@
   }
 </script>
 
-<main class="container">
-  <header class="header">
-    <a href="/">
-      <h1 class="header-title">{SITE_TITLE}</h1>
-    </a>
-    {#if isPageLoaded}
-      <div class="preview-link">
-        <a class="btn" href={finalLink}> Preview </a>
-      </div>
-    {/if}
-  </header>
+<main class="container" class:zen-mode={isZenMode}>
+  {#if !isZenMode}
+    <header class="header">
+      <a href="/">
+        <h1 class="header-title">{SITE_TITLE}</h1>
+      </a>
+      {#if isPageLoaded}
+        <div class="preview-link">
+          <a class="btn" href={finalLink}> Preview </a>
+          <button class="btn zen-btn" onclick={toggleZenMode}>
+            {isZenMode ? "Exit Zen" : "Zen Mode"}
+          </button>
+        </div>
+      {/if}
+    </header>
+  {:else}
+    <!-- Zen mode header with minimal controls -->
+    <div class="zen-header">
+      <button class="btn zen-btn" onclick={toggleZenMode}>
+        Exit Zen Mode
+      </button>
+    </div>
+  {/if}
 
-  <!-- Tabs Component -->
+  <!-- Tabs Component - Always visible -->
   <Tabs />
 
-  <div class="markdown-editor">
-    <SplitPane>
+  <div class="markdown-editor" class:zen-editor={isZenMode}>
+    <SplitPane leftInitialSize={isZenMode ? "100%" : "50%"}>
       <svelte:fragment slot="left">
         <div class="left-panel">
           <div class="editor">
@@ -109,31 +126,36 @@
         </div>
       </svelte:fragment>
       <svelte:fragment slot="right">
-        <div class="right-panel">
-          <div class="output">
-            <div class="output-content">
-              {#key activeContent}
-                <SvelteMarkdown source={activeContent} />
-              {/key}
+        {#if !isZenMode}
+          <div class="right-panel">
+            <div class="output">
+              <div class="output-content">
+                {#key activeContent}
+                  <SvelteMarkdown source={activeContent} />
+                {/key}
+              </div>
             </div>
           </div>
-        </div>
+        {/if}
       </svelte:fragment>
     </SplitPane>
   </div>
-  <div class="link">
-    <div>
-      <h2>Your {SITE_TITLE} link</h2>
-      <button class="btn" onclick={copyText}>Copy</button>
+
+  {#if !isZenMode}
+    <div class="link">
+      <div>
+        <h2>Your {SITE_TITLE} link</h2>
+        <button class="btn copy-btn" onclick={copyText}>Copy</button>
+      </div>
+      <pre class="output"><code>{`${finalLink}`}</code> <div
+          class="count">{outputCharacterCount} characters</div></pre>
+      <div>
+        <p>
+          <a href={GITHUB_REPO}>Contribute</a>
+        </p>
+      </div>
     </div>
-    <pre class="output"><code>{`${finalLink}`}</code> <div
-        class="count">{outputCharacterCount} characters</div></pre>
-    <div>
-      <p>
-        <a href={GITHUB_REPO}>Contribute</a>
-      </p>
-    </div>
-  </div>
+  {/if}
 </main>
 <Analytics />
 <svelte:head>
@@ -164,6 +186,20 @@
   }
   .preview-link {
     margin-left: auto;
+    display: flex;
+    gap: 0.5rem;
+    color: white;
+  }
+
+  .zen-btn {
+    background-color: #272727;
+    border-color: #272727;
+    color: white;
+  }
+
+  .zen-btn:hover {
+    background-color: #181818;
+    border-color: #181818;
   }
   .header-title {
     text-transform: capitalize;
@@ -243,13 +279,61 @@
     background-color: rgba(0, 0, 0, 0.5);
   }
 
+  /* Zen Mode Styles */
+  .zen-mode {
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .zen-header {
+    position: absolute;
+    top: 0rem;
+    right: 0rem;
+    z-index: 1000;
+  }
+
+  .zen-editor {
+    height: calc(100vh - 60px); /* Account for tabs height */
+    margin-top: 0;
+  }
+
+  .zen-editor .left-panel {
+    height: 100vh;
+    border: none;
+  }
+
+  .zen-editor .editor {
+    background: #001845;
+    height: 100%;
+  }
+
+  .zen-editor textarea {
+    padding: 2rem;
+    font-size: 18px;
+    line-height: 1.6;
+  }
+
   @media screen and (max-width: 600px) {
+    .header {
+      display: block;
+      margin-bottom: 1rem;
+    }
     .markdown-editor {
       grid-template-columns: 1fr;
     }
 
     .right-panel {
       display: none;
+    }
+
+    .zen-header {
+      top: unset;
+      bottom: 0;
+    }
+
+    .zen-editor textarea {
+      padding: 1rem;
+      font-size: 16px;
     }
   }
 </style>

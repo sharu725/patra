@@ -84,7 +84,7 @@
 
 <style>
   .tabs-container {
-    border-bottom: 1px solid rgb(84, 84, 84);
+    /* Remove bottom border */
   }
 
   .tabs-header {
@@ -98,6 +98,7 @@
 
   .tab {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     min-width: 60px;
     max-width: 120px;
@@ -110,8 +111,12 @@
   }
 
   .tab.active {
-    background: #ffffff;
-    border-bottom: 2px solid var(--brand-color);
+    background: var(--brand-color);
+    color: white;
+  }
+
+  .tab.active .tab-title {
+    color: white;
   }
 
   .tab:hover:not(.active) {
@@ -157,6 +162,10 @@
 
   .tab-close:hover {
     background: #ff4444;
+    color: white;
+  }
+
+  .tab.active .tab-close {
     color: white;
   }
 

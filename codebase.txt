@@ -266,6 +266,7 @@ self.addEventListener("fetch", (event) => {
   }
 
   .btn {
+    color: white;
     padding: 0.25rem 0.5rem;
     cursor: pointer;
     background-color: #83ba52;
