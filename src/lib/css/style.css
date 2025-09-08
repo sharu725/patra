@@ -1,23 +1,27 @@
+:root {
+  --brand-color: #83ba52;
+}
+
 .btn {
-    padding: 0.25rem 0.5rem;
-    cursor: pointer;
-    background-color: #83ba52;
-    border: 1px solid #83ba52;
-    border-radius: 2px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  background-color: var(--brand-color);
+  border: 1px solid var(--brand-color);
+  border-radius: 2px;
 }
 
 .btn:hover {
-    color: #111;
-    background-color: var(--brand-color);
+  color: #111;
+  background-color: var(--brand-color);
 }
 
 @media print {
-    .no-print {
-        display: none
-    }
+  .no-print {
+    display: none;
+  }
 
-    .preview {
-        margin: 0 !important;
-        max-width: 100% !important;
-    }
+  .preview {
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
 }

@@ -1,12 +1,13 @@
-<script>
+<script lang="ts">
   import { page } from "$app/state";
   import SvelteMarkdown from "svelte-markdown";
   import SplitPane from "$lib/components/SplitPanes.svelte";
+  import Tabs from "$lib/components/Tabs.svelte";
   import { dev } from "$app/environment";
   import { GITHUB_REPO, SITE_DESCRIPTION, SITE_TITLE } from "$lib/constants";
   import { onMount } from "svelte";
   import Analytics from "$lib/Analytics.svelte";
-  import { patra_data } from "$lib/stores.svelte.js";
+  import { tabs_data, tabHelpers } from "$lib/tabs_store.svelte";
 
   let source = $state("");
   let finalLink = $derived(`${page.url.origin}/note#${source}`);
@@ -14,20 +15,42 @@
   let inputCharacterCount = $state(0);
   let outputCharacterCount = $derived(finalLink?.length);
 
-  const handleInput = async () => {
-    source = await compressToUrlSafe(patra_data.current);
-    inputCharacterCount = patra_data.current?.length;
+  // Get the active tab content
+  let activeTab = $derived(tabHelpers.getActiveTab());
+  let activeContent = $derived(activeTab?.content || "");
+
+  const handleInput = async (event: Event) => {
+    const target = event.target as HTMLTextAreaElement;
+    const content = target.value;
+
+    // Update the active tab's content
+    if (activeTab) {
+      tabHelpers.updateTabContent(activeTab.id, content);
+    }
+
+    source = await compressToUrlSafe(content);
+    inputCharacterCount = content?.length;
   };
 
   onMount(async () => {
     isPageLoaded = true;
-    inputCharacterCount = patra_data.current?.length;
-    source = await compressToUrlSafe(patra_data.current);
+    inputCharacterCount = activeContent?.length;
+    source = await compressToUrlSafe(activeContent);
+  });
+
+  // Watch for active tab changes and update source
+  $effect(() => {
+    if (activeContent !== undefined) {
+      compressToUrlSafe(activeContent).then((compressed) => {
+        source = compressed;
+      });
+      inputCharacterCount = activeContent?.length;
+    }
   });
 
   const copyText = () => navigator.clipboard.writeText(finalLink);
 
-  async function compressToUrlSafe(text) {
+  async function compressToUrlSafe(text: string) {
     const encoder = new TextEncoder();
     const inputStream = new ReadableStream({
       start(controller) {
@@ -64,15 +87,20 @@
       </div>
     {/if}
   </header>
+
+  <!-- Tabs Component -->
+  <Tabs />
+
   <div class="markdown-editor">
     <SplitPane>
       <svelte:fragment slot="left">
         <div class="left-panel">
           <div class="editor">
             <textarea
-              bind:value={patra_data.current}
+              value={activeContent}
               oninput={handleInput}
               class="source"
+              placeholder="Start writing your markdown here..."
             ></textarea>
           </div>
           <div class="count">{inputCharacterCount} characters</div>
@@ -82,8 +110,8 @@
         <div class="right-panel">
           <div class="output">
             <div class="output-content">
-              {#key patra_data.current}
-                <SvelteMarkdown source={patra_data.current} />
+              {#key activeContent}
+                <SvelteMarkdown source={activeContent} />
               {/key}
             </div>
           </div>
@@ -145,7 +173,7 @@
   .left-panel,
   .right-panel {
     border: solid 1px rgb(84, 84, 84);
-    height: 85vh;
+    height: 80vh; /* Reduced height to account for tabs */
     background: #ffffff;
     overflow: hidden;
   }
