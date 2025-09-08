@@ -90,6 +90,7 @@
     padding: 0;
     overflow-x: auto;
     scroll-behavior: smooth;
+    transition: background-color 0.3s ease-in-out;
   }
 
   .tab {
@@ -104,6 +105,9 @@
     cursor: pointer;
     user-select: none;
     position: relative;
+    transition:
+      background-color 0.2s ease-in-out,
+      color 0.2s ease-in-out;
   }
 
   .tab.active {

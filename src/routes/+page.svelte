@@ -207,6 +207,7 @@
   }
   .markdown-editor {
     width: 100%;
+    transition: height 0.3s ease-in-out;
   }
   .left-panel,
   .right-panel {
@@ -214,6 +215,9 @@
     height: 80vh; /* Reduced height to account for tabs */
     background: #ffffff;
     overflow: hidden;
+    transition:
+      height 0.3s ease-in-out,
+      border 0.3s ease-in-out;
   }
   .left-panel {
     position: relative;
@@ -228,6 +232,9 @@
     padding: 1rem;
     height: 100%;
     overflow-y: auto;
+    transition:
+      padding 0.3s ease-in-out,
+      font-size 0.3s ease-in-out;
   }
 
   .right-panel {
@@ -254,6 +261,9 @@
 
   .link {
     margin: 1rem;
+    transition:
+      opacity 0.3s ease-in-out,
+      transform 0.3s ease-in-out;
   }
   .link h2 {
     margin-bottom: 0;
@@ -280,9 +290,20 @@
   }
 
   /* Zen Mode Styles */
+  .container {
+    transition: height 0.3s ease-in-out;
+  }
+
   .zen-mode {
     height: 100vh;
     overflow: hidden;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    font-weight: semibold;
   }
 
   .zen-header {
@@ -290,27 +311,45 @@
     top: 0rem;
     right: 0rem;
     z-index: 1000;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition:
+      opacity 0.3s ease-in-out,
+      transform 0.3s ease-in-out;
+  }
+
+  .zen-mode .zen-header {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .zen-editor {
     height: calc(100vh - 60px); /* Account for tabs height */
     margin-top: 0;
+    transition: height 0.3s ease-in-out;
   }
 
   .zen-editor .left-panel {
     height: 100vh;
     border: none;
+    transition:
+      height 0.3s ease-in-out,
+      border 0.3s ease-in-out;
   }
 
   .zen-editor .editor {
     background: #001845;
     height: 100%;
+    transition: background-color 0.3s ease-in-out;
   }
 
   .zen-editor textarea {
     padding: 2rem;
     font-size: 18px;
     line-height: 1.6;
+    transition:
+      padding 0.3s ease-in-out,
+      font-size 0.3s ease-in-out;
   }
 
   @media screen and (max-width: 600px) {
