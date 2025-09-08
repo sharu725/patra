@@ -2,11 +2,11 @@
   import { page } from "$app/state";
   import SvelteMarkdown from "svelte-markdown";
   import SplitPane from "$lib/components/SplitPanes.svelte";
-  import { patraData, siteTitle } from "$lib/store";
   import { dev } from "$app/environment";
   import { GITHUB_REPO, SITE_DESCRIPTION, SITE_TITLE } from "$lib/constants";
   import { onMount } from "svelte";
   import Analytics from "$lib/Analytics.svelte";
+  import { patra_data } from "$lib/stores.svelte.js";
 
   let source = $state("");
   let finalLink = $derived(`${page.url.origin}/note#${source}`);
@@ -15,14 +15,14 @@
   let outputCharacterCount = $derived(finalLink?.length);
 
   const handleInput = async () => {
-    source = await compressToUrlSafe($patraData);
-    inputCharacterCount = $patraData?.length;
+    source = await compressToUrlSafe(patra_data.current);
+    inputCharacterCount = patra_data.current?.length;
   };
 
   onMount(async () => {
     isPageLoaded = true;
-    inputCharacterCount = $patraData?.length;
-    source = await compressToUrlSafe($patraData);
+    inputCharacterCount = patra_data.current?.length;
+    source = await compressToUrlSafe(patra_data.current);
   });
 
   const copyText = () => navigator.clipboard.writeText(finalLink);
@@ -56,7 +56,7 @@
 <main class="container">
   <header class="header">
     <a href="/">
-      <h1 class="header-title">{siteTitle}</h1>
+      <h1 class="header-title">{SITE_TITLE}</h1>
     </a>
     {#if isPageLoaded}
       <div class="preview-link">
@@ -70,7 +70,7 @@
         <div class="left-panel">
           <div class="editor">
             <textarea
-              bind:value={$patraData}
+              bind:value={patra_data.current}
               oninput={handleInput}
               class="source"
             ></textarea>
@@ -82,8 +82,8 @@
         <div class="right-panel">
           <div class="output">
             <div class="output-content">
-              {#key $patraData}
-                <SvelteMarkdown source={$patraData} />
+              {#key patra_data.current}
+                <SvelteMarkdown source={patra_data.current} />
               {/key}
             </div>
           </div>
@@ -93,7 +93,7 @@
   </div>
   <div class="link">
     <div>
-      <h2>Your {siteTitle} link</h2>
+      <h2>Your {SITE_TITLE} link</h2>
       <button class="btn" onclick={copyText}>Copy</button>
     </div>
     <pre class="output"><code>{`${finalLink}`}</code> <div
