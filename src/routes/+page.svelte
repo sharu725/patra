@@ -237,7 +237,9 @@
     gap: 0.5rem;
     color: white;
   }
-
+  .copy-btn {
+    color: white;
+  }
   .zen-btn {
     background-color: #272727;
     border-color: #272727;
@@ -263,10 +265,13 @@
     background-color: #0056b3;
     border-color: #0056b3;
   }
+
   .header-title {
+    font-size: 1.5em;
     text-transform: capitalize;
     margin: 0;
   }
+
   .markdown-editor {
     width: 100%;
     transition: height 0.3s ease-in-out;
