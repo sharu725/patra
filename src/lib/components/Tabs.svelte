@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { tabs_data, tabHelpers } from "$lib/tabs_store.svelte";
+  import { tabs_data, tabHelpers, activeTabId } from "$lib/tabs_store.svelte";
 
   let editingTabId = $state<string | null>(null);
   let tempTitle = $state("");
@@ -45,8 +45,8 @@
 
 <div class="tabs-container">
   <div class="tabs-header">
-    {#each tabs_data.current.tabs as tab (tab.id)}
-      <div class="tab" class:active={tab.id === tabs_data.current.activeTabId}>
+    {#each tabs_data.current as tab (tab.id)}
+      <div class="tab" class:active={tab.id === activeTabId.current}>
         {#if editingTabId === tab.id}
           <input
             bind:value={tempTitle}
@@ -64,7 +64,7 @@
           </button>
         {/if}
 
-        {#if tabs_data.current.tabs.length > 1}
+        {#if tabs_data.current.length > 1}
           <button
             class="tab-close"
             onclick={() => handleRemoveTab(tab.id)}

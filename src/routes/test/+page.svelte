@@ -1,95 +1,63 @@
 <script>
-  import Dexie from "dexie";
-  import { onMount } from "svelte";
+  import createIndexedDBStore from "$lib/indexeddb_store.svelte";
 
-  // Create a reactive IndexedDB store
-  function createIndexedDBStore(dbName, storeName, initialValue) {
-    // Initialize the database
-    const db = new Dexie(dbName);
-    db.version(1).stores({
-      [storeName]: "++id, name, age",
-    });
+  // Usage Examples - ANY DATA TYPE (No unnecessary IDs):
 
-    // Create reactive state
-    let value = $state(initialValue);
-    let isInitialized = $state(false);
+  // 1. Objects with natural ID
+  let friend = createIndexedDBStore(
+    "test-database",
+    "friends",
+    {
+      id: 3,
+      name: "sharath",
+      age: 12,
+      hobbies: ["coding", "reading"],
+      metadata: { created: new Date(), tags: ["friend", "close"] },
+    },
+    "id"
+  ); // Specify which field is the primary key
+  let message = createIndexedDBStore("app", "currentMessage", "Hello World!");
+  let counter = createIndexedDBStore("app", "clickCount", 0);
+  let todoList = createIndexedDBStore("app", "todos", [
+    "Buy milk",
+    "Walk dog",
+    "Code app",
+  ]);
+  $inspect(message);
+  $inspect(counter);
+  $inspect(todoList);
+  // 2. Strings (no ID needed!)
+  /*
+  let message = createIndexedDBStore("app", "currentMessage", "Hello World!");
+  // Usage: message.current = "New message"; (auto-saves)
+  */
 
-    // Initialize and load from DB
-    async function initialize() {
-      try {
-        await db.open();
+  // 3. Numbers (no ID needed!)
+  /*
+  let counter = createIndexedDBStore("app", "clickCount", 0);
+  // Usage: counter.current++; (auto-saves)
+  */
 
-        // Try to load existing data
-        const existing = await db[storeName].get(initialValue.id);
-        if (existing) {
-          value = existing;
-        } else {
-          // Save initial value to DB if not exists - use snapshot for plain object
-          await db[storeName].put($state.snapshot(initialValue));
-        }
+  // 4. Arrays (no ID needed!)
+  /*
+  let todoList = createIndexedDBStore("app", "todos", ["Buy milk", "Walk dog", "Code app"]);
+  // Usage: todoList.current.push("New todo"); (auto-saves)
+  */
 
-        isInitialized = true;
-      } catch (error) {
-        console.error("Failed to initialize IndexedDB:", error);
-        isInitialized = true; // Still mark as initialized to prevent hanging
-      }
-    }
+  // 5. Booleans (no ID needed!)
+  /*
+  let isLoggedIn = createIndexedDBStore("app", "loginStatus", false);
+  // Usage: isLoggedIn.current = true;
+  */
 
-    // Save to IndexedDB whenever value changes
-    $effect(() => {
-      if (isInitialized && value) {
-        // Debounce writes to avoid too frequent DB operations
-        const timeoutId = setTimeout(async () => {
-          try {
-            // Use snapshot to get plain object without proxy
-            const snapshot = $state.snapshot(value);
-            await db[storeName].put(snapshot);
-            console.log("Synced to IndexedDB:", snapshot);
-          } catch (error) {
-            console.error("Failed to sync to IndexedDB:", error);
-          }
-        }, 100);
-
-        return () => clearTimeout(timeoutId);
-      }
-    });
-
-    return {
-      get current() {
-        return value;
-      },
-      set current(newValue) {
-        value = newValue;
-      },
-      get isInitialized() {
-        return isInitialized;
-      },
-      initialize,
-      db,
-      // Utility methods
-      async reload() {
-        const fresh = await db[storeName].get(value.id);
-        if (fresh) value = fresh;
-      },
-      async delete() {
-        await db[storeName].delete(value.id);
-      },
-    };
-  }
-
-  // Usage
-  let friend = createIndexedDBStore("test-database", "friends", {
-    id: 3,
-    name: "sharath",
-    age: 12,
-  });
-
-  // Initialize on mount
-  onMount(() => {
-    friend.initialize();
-  });
-
-  // Helper functions for the form
+  // 6. Objects with custom primary key
+  /*
+  let user = createIndexedDBStore("app", "users", {
+    email: "test@example.com", // This becomes the primary key
+    name: "John",
+    preferences: { theme: "dark", language: "en" }
+  }, "email");
+  */ // Helper functions for the form
   let newName = $state("");
   let newAge = $state(21);
   let status = $state("");

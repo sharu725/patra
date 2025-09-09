@@ -1,5 +1,6 @@
 import { LocalStorage } from "./local_store.svelte";
 import { defaultValue } from "./stores.svelte.js";
+import createIndexedDBStore from "$lib/indexeddb_store.svelte";
 
 export const defaultTabContent = `## New Tab
 Start writing your markdown here...
@@ -19,12 +20,6 @@ export interface Tab {
   originalContent?: string;
 }
 
-// Structure for tabs data
-export interface TabsData {
-  tabs: Tab[];
-  activeTabId: string;
-}
-
 // Create initial tab
 const createInitialTab = (): Tab => ({
   id: "tab-1",
@@ -35,40 +30,52 @@ const createInitialTab = (): Tab => ({
   originalContent: defaultValue,
 });
 
-const defaultTabsData: TabsData = {
-  tabs: [createInitialTab()],
-  activeTabId: "tab-1",
-};
+const defaultTabs: Tab[] = [createInitialTab()];
 
-export const tabs_data = new LocalStorage("patra_tabs_data", defaultTabsData);
+// Store only tabs array in IndexedDB - activeTab will not persist
+export const tabs_data = createIndexedDBStore(
+  "patra_db",
+  "patra_tabs",
+  defaultTabs
+);
+
+// Separate reactive state for activeTab that doesn't persist
+// Always defaults to tab-1 on reload
+let _activeTabId = $state("tab-1");
+
+export const activeTabId = {
+  get current() {
+    return _activeTabId;
+  },
+  set current(value: string) {
+    _activeTabId = value;
+  },
+};
 
 // Helper functions to manage tabs
 export const tabHelpers = {
   addNewTab: () => {
-    const currentData = tabs_data.current;
+    const currentTabs = tabs_data.current;
     const newTabId = `tab-${Date.now()}`;
     const newTab: Tab = {
       id: newTabId,
-      title: `Tab ${currentData.tabs.length + 1}`,
+      title: `Tab ${currentTabs.length + 1}`,
       content: defaultTabContent,
       createdAt: Date.now(),
       hasUnsavedChanges: false,
       originalContent: defaultTabContent,
     };
 
-    tabs_data.current = {
-      ...currentData,
-      tabs: [...currentData.tabs, newTab],
-      activeTabId: newTabId,
-    };
+    tabs_data.current = [...currentTabs, newTab];
+    activeTabId.current = newTabId;
   },
 
   removeTab: (tabId: string) => {
-    const currentData = tabs_data.current;
-    if (currentData.tabs.length <= 1) return; // Don't remove the last tab
+    const currentTabs = tabs_data.current;
+    if (currentTabs.length <= 1) return; // Don't remove the last tab
 
     // Check if tab has unsaved changes
-    const tabToRemove = currentData.tabs.find((tab: Tab) => tab.id === tabId);
+    const tabToRemove = currentTabs.find((tab: Tab) => tab.id === tabId);
     if (tabToRemove?.hasUnsavedChanges) {
       const confirmClose = confirm(
         `Tab "${tabToRemove.title}" has unsaved changes. Are you sure you want to close it?`
@@ -76,33 +83,23 @@ export const tabHelpers = {
       if (!confirmClose) return;
     }
 
-    const remainingTabs = currentData.tabs.filter(
-      (tab: Tab) => tab.id !== tabId
-    );
-    let newActiveTabId = currentData.activeTabId;
+    const remainingTabs = currentTabs.filter((tab: Tab) => tab.id !== tabId);
 
-    // If we're removing the active tab, switch to another tab
-    if (tabId === currentData.activeTabId) {
-      newActiveTabId = remainingTabs[0].id;
+    // If we're removing the active tab, switch to the first tab
+    if (tabId === activeTabId.current) {
+      activeTabId.current = remainingTabs[0].id;
     }
 
-    tabs_data.current = {
-      tabs: remainingTabs,
-      activeTabId: newActiveTabId,
-    };
+    tabs_data.current = remainingTabs;
   },
 
   setActiveTab: (tabId: string) => {
-    const currentData = tabs_data.current;
-    tabs_data.current = {
-      ...currentData,
-      activeTabId: tabId,
-    };
+    activeTabId.current = tabId;
   },
 
   updateTabContent: (tabId: string, content: string) => {
-    const currentData = tabs_data.current;
-    const updatedTabs = currentData.tabs.map((tab: Tab) => {
+    const currentTabs = tabs_data.current;
+    const updatedTabs = currentTabs.map((tab: Tab) => {
       if (tab.id === tabId) {
         const hasUnsavedChanges =
           content !== (tab.originalContent || tab.content);
@@ -115,35 +112,29 @@ export const tabHelpers = {
       return tab;
     });
 
-    tabs_data.current = {
-      ...currentData,
-      tabs: updatedTabs,
-    };
+    tabs_data.current = updatedTabs;
   },
 
   updateTabTitle: (tabId: string, title: string) => {
-    const currentData = tabs_data.current;
-    const updatedTabs = currentData.tabs.map((tab: Tab) =>
+    const currentTabs = tabs_data.current;
+    const updatedTabs = currentTabs.map((tab: Tab) =>
       tab.id === tabId ? { ...tab, title } : tab
     );
 
-    tabs_data.current = {
-      ...currentData,
-      tabs: updatedTabs,
-    };
+    tabs_data.current = updatedTabs;
   },
 
   getActiveTab: () => {
-    const currentData = tabs_data.current;
+    const currentTabs = tabs_data.current;
     return (
-      currentData.tabs.find((tab: Tab) => tab.id === currentData.activeTabId) ||
-      currentData.tabs[0]
+      currentTabs.find((tab: Tab) => tab.id === activeTabId.current) ||
+      currentTabs[0]
     );
   },
 
   markTabAsSaved: (tabId: string) => {
-    const currentData = tabs_data.current;
-    const updatedTabs = currentData.tabs.map((tab: Tab) => {
+    const currentTabs = tabs_data.current;
+    const updatedTabs = currentTabs.map((tab: Tab) => {
       if (tab.id === tabId) {
         return {
           ...tab,
@@ -154,9 +145,6 @@ export const tabHelpers = {
       return tab;
     });
 
-    tabs_data.current = {
-      ...currentData,
-      tabs: updatedTabs,
-    };
+    tabs_data.current = updatedTabs;
   },
 };
