@@ -103,7 +103,7 @@ function createIndexedDBStore(
             }
 
             await db[storeName].put(dataToStore);
-            console.log("Synced to IndexedDB:", dataToStore);
+            // console.log("Synced to IndexedDB:", dataToStore);
           } catch (error) {
             console.error("Failed to sync to IndexedDB:", error);
           }
@@ -150,3 +150,20 @@ function createIndexedDBStore(
 }
 
 export default createIndexedDBStore;
+
+// write the usage example below
+// Example usage:
+
+// import createIndexedDBStore from "./indexeddb_store.svelte";
+
+//generic
+// export const myGenericStore = createIndexedDBStore("database-name", "store-name", datatoStore, primaryKey(optional));
+
+// For primitive or array data
+// export const myPrimitiveStore = createIndexedDBStore("MyDB", "PrimitiveStore", "Hello, IndexedDB!");
+
+// For object data with a primary key
+// export const myObjectStore = createIndexedDBStore("MyDB", "ObjectStore", { id: 1, name: "Item 1" }, "id");
+
+// For object data without a primary key (will use auto-increment ID)
+// export const myGenericObjectStore = createIndexedDBStore("MyDB", "GenericObjectStore", { name: "No ID Item" });

@@ -7,7 +7,7 @@
   import { GITHUB_REPO, SITE_DESCRIPTION, SITE_TITLE } from "$lib/constants";
   import { onMount } from "svelte";
   import Analytics from "$lib/Analytics.svelte";
-  import { tabHelpers } from "$lib/tabs_store.svelte";
+  import { tabHelpers, tabs_data } from "$lib/tabs_store.svelte";
 
   let source = $state("");
   let finalLink = $derived(`${page.url.origin}/note#${source}`);
@@ -57,6 +57,34 @@
     navigator.clipboard.writeText(finalLink);
   };
 
+  const downloadAllTabs = () => {
+    const tabs = tabs_data.current;
+    let markdownContent = "";
+
+    tabs.forEach((tab, index) => {
+      // Add tab title with equals underline
+      markdownContent += `${tab.title}\n`;
+      markdownContent += "=".repeat(tab.title.length) + "\n";
+      markdownContent += tab.content;
+
+      // Add spacing between tabs (except for the last one)
+      if (index < tabs.length - 1) {
+        markdownContent += "\n\n\n";
+      }
+    });
+
+    // Create and download the file
+    const blob = new Blob([markdownContent], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "patra_data_all_tabs.md";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   async function compressToUrlSafe(text: string) {
     const encoder = new TextEncoder();
     const inputStream = new ReadableStream({
@@ -92,6 +120,27 @@
       {#if isPageLoaded}
         <div class="preview-link">
           <a class="btn" href={finalLink}> Preview </a>
+          <button
+            class="btn download-btn"
+            onclick={downloadAllTabs}
+            title="Download all tabs as markdown"
+            aria-label="Download all tabs as markdown"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7,10 12,15 17,10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </button>
           <button class="btn zen-btn" onclick={toggleZenMode}>
             {isZenMode ? "Exit Zen" : "Zen Mode"}
           </button>
@@ -130,9 +179,7 @@
           <div class="right-panel">
             <div class="output">
               <div class="output-content">
-                {#key activeContent}
-                  <SvelteMarkdown source={activeContent} />
-                {/key}
+                <SvelteMarkdown source={activeContent} />
               </div>
             </div>
           </div>
@@ -200,6 +247,21 @@
   .zen-btn:hover {
     background-color: #181818;
     border-color: #181818;
+  }
+
+  .download-btn {
+    background-color: var(--brand-color);
+    border-color: var(--brand-color);
+    color: white;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .download-btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
   }
   .header-title {
     text-transform: capitalize;

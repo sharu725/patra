@@ -109,7 +109,7 @@
     <div class="home no-print">
       <a href="/"> Back </a>
     </div>
-    <div bind:this={contentRef}>
+    <div class="md" bind:this={contentRef}>
       <SvelteMarkdown {source} on:parsed={handleParsed} />
     </div>
     <div class="home no-print">
@@ -132,6 +132,9 @@
 </svelte:head>
 
 <style>
+  .md {
+    min-height: 90vh;
+  }
   .preview {
     display: flex;
     flex-direction: column;
