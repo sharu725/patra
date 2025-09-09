@@ -1,18 +1,77 @@
 :root {
   --brand-color: #83ba52;
+  --hover-color: #3d631c;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "JetBrains Mono", monospace;
+  --brand-color: #67993b;
+}
+
+.output-content *,
+.preview * {
+  max-width: 100%;
+}
+
+.preview {
+  max-width: 80%;
+  margin: 2rem auto;
+}
+
+blockquote {
+  padding-left: 1em;
+  margin-left: 1rem;
+  font-style: italic;
+  border-left: 2px solid var(--brand-color);
+}
+
+pre {
+  padding: 1rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+  background-color: rgb(200, 249, 168);
+  border-radius: 0.25rem;
+  border: 1px dashed green;
+}
+
+table {
+  margin-bottom: 1rem;
+  width: 100%;
+  border: 0 solid #999;
+  border-collapse: collapse;
+}
+
+td,
+th {
+  padding: 0.25rem 0.5rem;
+  border-color: inherit;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #e5e5e5;
+}
+
+thead th {
+  border-bottom-color: #999;
+}
+
+tbody tr:nth-child(odd) td,
+tbody tr:nth-child(odd) th {
+  background-color: #f9f9f9;
 }
 
 .btn {
+  color: white;
   padding: 0.25rem 0.5rem;
   cursor: pointer;
   background-color: var(--brand-color);
   border: 1px solid var(--brand-color);
   border-radius: 2px;
+  transition-duration: 300ms;
 }
 
 .btn:hover {
-  color: #111;
-  background-color: var(--brand-color);
+  background-color: var(--hover-color);
 }
 
 @media print {

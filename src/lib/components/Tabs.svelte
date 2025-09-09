@@ -161,7 +161,7 @@
   }
 
   .tab-close:hover {
-    background: #ff4444;
+    background: #5f5f5f;
     color: white;
   }
 

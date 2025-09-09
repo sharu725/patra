@@ -121,7 +121,7 @@
         <div class="preview-link">
           <a class="btn" href={finalLink}> Preview </a>
           <button
-            class="btn download-btn"
+            class="btn"
             onclick={downloadAllTabs}
             title="Download all tabs as markdown"
             aria-label="Download all tabs as markdown"
@@ -194,8 +194,9 @@
         <h2>Your {SITE_TITLE} link</h2>
         <button class="btn copy-btn" onclick={copyText}>Copy</button>
       </div>
-      <pre class="output"><code>{`${finalLink}`}</code> <div
-          class="count">{outputCharacterCount} characters</div></pre>
+      <pre class="output"><code>{`${finalLink}`}</code>
+        <div class="count">{outputCharacterCount} characters</div>
+      </pre>
       <div>
         <p>
           <a href={GITHUB_REPO}>Contribute</a>
@@ -247,23 +248,8 @@
   }
 
   .zen-btn:hover {
-    background-color: #181818;
-    border-color: #181818;
-  }
-
-  .download-btn {
-    background-color: var(--brand-color);
-    border-color: var(--brand-color);
-    color: white;
-    padding: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .download-btn:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
+    background-color: var(--hover-color);
+    border-color: var(--hover-color);
   }
 
   .header-title {
@@ -279,7 +265,7 @@
   .left-panel,
   .right-panel {
     border: solid 1px rgb(84, 84, 84);
-    height: 80vh; /* Reduced height to account for tabs */
+    height: 80vh;
     background: #ffffff;
     overflow: hidden;
     transition:
@@ -319,15 +305,13 @@
   .source:focus {
     outline: none;
   }
-  .output {
-    width: 100%;
-  }
+
   .output-content {
     padding: 1rem;
   }
 
   .link {
-    margin: 1rem;
+    padding: 1rem;
     transition:
       opacity 0.3s ease-in-out,
       transform 0.3s ease-in-out;
