@@ -62,9 +62,8 @@
     let markdownContent = "";
 
     tabs.forEach((tab, index) => {
-      // Add tab title with equals underline
-      markdownContent += `${tab.title}\n`;
-      markdownContent += "=".repeat(tab.title.length) + "\n";
+      // Add tab title as markdown comment
+      markdownContent += `[${tab.title}]: #\n`;
       markdownContent += tab.content;
 
       // Add spacing between tabs (except for the last one)
@@ -73,12 +72,19 @@
       }
     });
 
+    // Create timestamp in yyyy-mm-dd format
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const timestamp = `${year}_${month}_${day}`;
+
     // Create and download the file
     const blob = new Blob([markdownContent], { type: "text/markdown" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "patra_data_all_tabs.md";
+    link.download = `patra_data_all_tabs-${timestamp}.md`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
