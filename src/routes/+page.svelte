@@ -1,6 +1,5 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import SvelteMarkdown from "svelte-markdown";
   import SplitPane from "$lib/components/SplitPanes.svelte";
   import Tabs from "$lib/components/Tabs.svelte";
   import { dev } from "$app/environment";
@@ -8,6 +7,7 @@
   import { onMount } from "svelte";
   import Analytics from "$lib/Analytics.svelte";
   import { tabHelpers, tabs_data } from "$lib/tabs_store.svelte";
+  import MarkdownRender from "$lib/components/MarkdownRender.svelte";
 
   let source = $state("");
   let finalLink = $derived(`${page.url.origin}/note#${source}`);
@@ -185,7 +185,7 @@
           <div class="right-panel">
             <div class="output">
               <div class="output-content">
-                <SvelteMarkdown source={activeContent} />
+                <MarkdownRender md={activeContent} />
               </div>
             </div>
           </div>

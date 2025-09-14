@@ -3,6 +3,7 @@
   import SvelteMarkdown from "svelte-markdown";
   import { page } from "$app/state";
   import { onMount } from "svelte";
+  import MarkdownRender from "$lib/components/MarkdownRender.svelte";
 
   let slug = $derived(page.url?.hash?.slice(1));
   let metaTitle = $state("Share Notes");
@@ -12,7 +13,32 @@
 
   onMount(async () => {
     source = await decompressFromUrlSafe(slug);
+    // Extract title and plain text after content is rendered
+    setTimeout(() => {
+      extractTitleAndText();
+    }, 100);
   });
+
+  const extractTitleAndText = () => {
+    if (contentRef) {
+      // Extract title from first line of source and truncate if needed
+      const firstLine = source
+        .split("\n")[0]
+        .replace(/^#+\s*/, "") // Remove markdown heading syntax
+        .trim();
+
+      if (firstLine) {
+        // Truncate to 60 characters and add ellipsis if longer
+        metaTitle =
+          firstLine.length > 60
+            ? firstLine.substring(0, 60) + "..."
+            : firstLine;
+      }
+
+      // Extract plain text content
+      plainText = contentRef.textContent.trim().replace(/\n\s*\n/g, "\n\n");
+    }
+  };
 
   const handleParsed = (/** @type {{ detail: { tokens: any; }; }} */ event) => {
     const tokens = event.detail.tokens;
@@ -110,7 +136,8 @@
       <a href="/"> Back </a>
     </div>
     <div class="md" bind:this={contentRef}>
-      <SvelteMarkdown {source} on:parsed={handleParsed} />
+      <!-- <SvelteMarkdown {source} on:parsed={handleParsed} /> -->
+      <MarkdownRender md={source} />
     </div>
     <div class="home no-print">
       <div class="export-options">

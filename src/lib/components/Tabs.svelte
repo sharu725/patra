@@ -46,6 +46,7 @@
 <div class="tabs-container">
   <div class="tabs-header">
     {#each tabs_data.current as tab (tab.id)}
+      {console.log(tab)}
       <div class="tab" class:active={tab.id === activeTabId.current}>
         {#if editingTabId === tab.id}
           <input
