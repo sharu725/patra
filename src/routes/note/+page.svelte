@@ -39,23 +39,6 @@
     }
   };
 
-  const handleParsed = (/** @type {{ detail: { tokens: any; }; }} */ event) => {
-    const tokens = event.detail.tokens;
-    let index = 0;
-    tokens.map(({ text }) => {
-      if (text && !index) {
-        index++;
-        metaTitle = text;
-      }
-    });
-
-    setTimeout(() => {
-      if (contentRef) {
-        plainText = contentRef.textContent.trim().replace(/\n\s*\n/g, "\n\n");
-      }
-    }, 0);
-  };
-
   function downloadMarkdown() {
     if (!source) return;
     const blob = new Blob([source], { type: "text/markdown" });
