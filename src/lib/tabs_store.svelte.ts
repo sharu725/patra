@@ -128,6 +128,7 @@ export const tabHelpers = {
     const currentTabs = tabs_data.current;
     return (
       currentTabs.find((tab: Tab) => tab.id === activeTabId.current) ||
+      currentTabs.find((tab: Tab) => tab.id === "tab-1") ||
       currentTabs[0]
     );
   },

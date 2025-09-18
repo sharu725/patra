@@ -1,6 +1,5 @@
 <script>
   import { SITE_DESCRIPTION, SITE_SHORT_TITLE } from "$lib/constants.js";
-  import SvelteMarkdown from "svelte-markdown";
   import { page } from "$app/state";
   import { onMount } from "svelte";
   import MarkdownRender from "$lib/components/MarkdownRender.svelte";
